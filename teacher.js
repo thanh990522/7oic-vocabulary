@@ -105,6 +105,7 @@ const elements = {
   studentDetailPercent: document.querySelector("#studentDetailPercent"),
   studentDetailProgressBar: document.querySelector("#studentDetailProgressBar"),
   studentDetailProgressLabel: document.querySelector("#studentDetailProgressLabel"),
+  studentPracticeGrid: document.querySelector("#studentPracticeGrid"),
   studentThemeGrid: document.querySelector("#studentThemeGrid"),
   activityCountBadge: document.querySelector("#activityCountBadge"),
   studentActivityTable: document.querySelector("#studentActivityTable"),
@@ -466,17 +467,34 @@ function renderStudentActivity() {
   elements.studentActivityEmpty.hidden = items.length > 0;
   elements.studentActivityTable.parentElement.parentElement.hidden = items.length === 0;
   elements.studentActivityTable.innerHTML = items.map(item => {
-    const flashcard = item.type === "flashcard";
+    const activityLabels = {
+      flashcard: "🃏 Flashcard",
+      reset: "🧹 Đặt lại tiến độ",
+      "practice-matching": "🧩 Nối từ với nghĩa",
+      "practice-spelling": "🎧 Nghe & viết từ",
+      "practice-situation": "💬 Chọn từ theo ngữ cảnh",
+      "practice-speed": "⚡ Speed Quiz"
+    };
     const resultLabels = {
       known: ["Đã nhớ", "activity-result--known"],
       review: ["Cần ôn", "activity-result--review"],
-      reset: ["Đặt lại", "activity-result--reset"]
+      reset: ["Đặt lại", "activity-result--reset"],
+      correct: ["Chính xác", "activity-result--known"],
+      incorrect: ["Chưa đúng", "activity-result--reset"],
+      completed: ["Hoàn thành", "activity-result--known"],
+      "timed-out": ["Hết giờ", "activity-result--review"]
     };
-    const [result, resultClass] = resultLabels[item.status] || ["Đã luyện", ""];
+    const hasScore = Number.isFinite(Number(item.score)) && Number.isFinite(Number(item.total)) && Number(item.total) > 0;
+    const [statusResult, statusClass] = resultLabels[item.status] || ["Đã luyện", ""];
+    const result = hasScore ? `${item.score}/${item.total} · ${statusResult}` : statusResult;
+    const resultClass = hasScore
+      ? (Number(item.score) === Number(item.total) ? "activity-result--known" : Number(item.score) > 0 ? "activity-result--review" : "activity-result--reset")
+      : statusClass;
+    const duration = Number(item.durationSeconds) > 0 ? `<small>${Number(item.durationSeconds)} giây</small>` : "";
     return `
       <tr>
         <td>${escapeHtml(formatDate(item.updatedAt))}</td>
-        <td>${flashcard ? "🃏 Flashcard" : "🧹 Đặt lại tiến độ"}</td>
+        <td><strong>${escapeHtml(activityLabels[item.type] || item.exerciseTitle || "Luyện tập")}</strong>${duration}</td>
         <td><strong>${escapeHtml(item.word || "—")}</strong></td>
         <td>${escapeHtml(item.lesson || `Theme ${item.themeId || 1}`)}</td>
         <td><span class="activity-result ${resultClass}">${escapeHtml(result)}</span></td>
@@ -494,7 +512,7 @@ function subscribeStudentActivity(studentId) {
   const activityQuery = query(
     collection(db, "students", studentId, "activity"),
     orderBy("updatedAt", "desc"),
-    limit(100)
+    limit(250)
   );
   state.activityUnsubscribe = onSnapshot(activityQuery, snapshot => {
     hideDataError();
@@ -529,6 +547,25 @@ function renderStudentDetail() {
   elements.studentDetailPercent.textContent = `${progress.percent}%`;
   elements.studentDetailProgressBar.style.width = `${progress.percent}%`;
   elements.studentDetailProgressLabel.textContent = `${progress.percent}% hoàn thành`;
+
+  const practice = student.themeProgress?.theme1?.practice || {};
+  const practiceItems = [
+    ["🧩", "Nối từ với nghĩa", valueCount(practice.matching?.completedWords)],
+    ["🎧", "Nghe & viết từ", valueCount(practice.spelling?.completedWords)],
+    ["💬", "Chọn từ theo ngữ cảnh", valueCount(practice.situation?.completedWords)],
+    ["⚡", "Speed Quiz", valueCount(practice.speed?.completedWords)]
+  ];
+  elements.studentPracticeGrid.innerHTML = practiceItems.map(([icon, label, completed]) => {
+    const safeCompleted = Math.min(60, Number(completed) || 0);
+    const percent = Math.round((safeCompleted / 60) * 100);
+    return `
+      <div class="teacher-practice-item">
+        <div><span>${icon}</span><strong>${escapeHtml(label)}</strong><em>${safeCompleted}/60</em></div>
+        <span class="teacher-practice-track"><i style="width:${percent}%"></i></span>
+        <small>${percent}% từ đã thực hành</small>
+      </div>
+    `;
+  }).join("");
 
   elements.studentThemeGrid.innerHTML = THEME_NAMES.map((name, index) => {
     const number = index + 1;
@@ -569,10 +606,17 @@ function renderDashboard() {
 }
 
 function createThemeProgress() {
-  return Object.fromEntries(Array.from({ length: 9 }, (_, index) => [
+  const progress = Object.fromEntries(Array.from({ length: 9 }, (_, index) => [
     `theme${index + 1}`,
     { known: [], review: [], practiced: 0, total: index === 0 ? 60 : 0 }
   ]));
+  progress.theme1.practice = {
+    matching: { completedWords: [], roundsCompleted: [] },
+    spelling: { completedWords: [], correctWords: [] },
+    situation: { completedWords: [], correctWords: [] },
+    speed: { completedWords: [], bestScores: {} }
+  };
+  return progress;
 }
 
 function generateStudentPassword() {
