@@ -151,6 +151,31 @@ button {
   letter-spacing: 0.08em;
 }
 
+.institution-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.institution-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 2px solid rgba(114, 87, 232, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 6px 16px rgba(78, 53, 183, 0.09);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.institution-badge--school { color: var(--purple-dark); }
+.institution-badge--teacher { color: #a13c64; background: rgba(255, 231, 240, 0.9); }
+.institution-badge > span { font-size: 1rem; }
+
 .eyebrow {
   margin: 20px 0 2px;
   color: var(--muted);
@@ -919,9 +944,18 @@ kbd { padding: 2px 6px; border: 1px solid #d5cee9; border-radius: 6px; backgroun
   color: var(--muted);
   font-size: 0.83rem;
 }
-.site-footer > div:first-child { display: flex; align-items: center; gap: 13px; }
+.footer-brand { display: flex; align-items: center; gap: 13px; }
 .footer-logo { color: var(--purple-dark); font-weight: 950; }
 .site-footer p { margin: 0; }
+.footer-institution {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.footer-institution strong { color: var(--purple-dark); }
+.footer-institution span { font-size: 0.76rem; font-weight: 800; }
 .footer-icons { letter-spacing: 5px; }
 
 .toast {
@@ -1053,6 +1087,7 @@ select:focus-visible {
   .memory-button { min-height: 48px; border-radius: 14px; }
   .memory-button { gap: 3px; padding: 0 5px; font-size: 0.75rem; }
   .site-footer { align-items: flex-start; flex-direction: column; padding-inline: 18px; }
+  .footer-institution { align-items: flex-start; text-align: left; }
   .footer-icons { display: none; }
 }
 
