@@ -1,7 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {
   browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  deleteUser,
   getAuth,
+  inMemoryPersistence,
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
@@ -18,11 +21,18 @@ import {
   setDoc,
   where
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-import { firebaseConfig, TEACHER_EMAIL } from "./firebase-config.js";
+import {
+  firebaseConfig,
+  normalizeStudentUsername,
+  studentUsernameToEmail,
+  TEACHER_EMAIL
+} from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const provisioningApp = initializeApp(firebaseConfig, "student-provisioning");
+const provisioningAuth = getAuth(provisioningApp);
 
 const state = {
   classes: [],
@@ -67,8 +77,16 @@ const elements = {
   createStudentForm: document.querySelector("#createStudentForm"),
   studentNameInput: document.querySelector("#studentNameInput"),
   studentUsernameInput: document.querySelector("#studentUsernameInput"),
+  studentPasswordInput: document.querySelector("#studentPasswordInput"),
+  generateStudentPasswordButton: document.querySelector("#generateStudentPasswordButton"),
+  toggleStudentPasswordButton: document.querySelector("#toggleStudentPasswordButton"),
   studentClassInput: document.querySelector("#studentClassInput"),
   createStudentButton: document.querySelector("#createStudentButton"),
+  credentialDialog: document.querySelector("#credentialDialog"),
+  createdStudentName: document.querySelector("#createdStudentName"),
+  createdStudentUsername: document.querySelector("#createdStudentUsername"),
+  createdStudentPassword: document.querySelector("#createdStudentPassword"),
+  copyStudentCredentialsButton: document.querySelector("#copyStudentCredentialsButton"),
   dashboardToast: document.querySelector("#dashboardToast")
 };
 
@@ -339,8 +357,34 @@ function renderDashboard() {
 function createThemeProgress() {
   return Object.fromEntries(Array.from({ length: 9 }, (_, index) => [
     `theme${index + 1}`,
-    { known: 0, review: 0, practiced: 0, total: index === 0 ? 60 : 0 }
+    { known: [], review: [], practiced: 0, total: index === 0 ? 60 : 0 }
   ]));
+}
+
+function generateStudentPassword() {
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  const random = Array.from({ length: 8 }, () => characters[Math.floor(Math.random() * characters.length)]).join("");
+  const password = `Va7!${random}`;
+  elements.studentPasswordInput.value = password;
+  elements.studentPasswordInput.type = "text";
+  elements.toggleStudentPasswordButton.textContent = "🙈";
+  elements.toggleStudentPasswordButton.setAttribute("aria-label", "Ẩn mật khẩu");
+}
+
+function readableStudentAccountError(error) {
+  const code = error?.code || "";
+  if (code.includes("email-already-in-use")) return "Tên đăng nhập này đã có tài khoản.";
+  if (code.includes("weak-password")) return "Mật khẩu chưa đáp ứng chính sách bảo mật Firebase.";
+  if (code.includes("operation-not-allowed")) return "Firebase chưa bật phương thức Email/Password.";
+  if (code.includes("too-many-requests")) return "Đã tạo quá nhiều tài khoản trong thời gian ngắn. Vui lòng thử lại sau.";
+  return "Chưa thể tạo tài khoản học sinh. Hãy kiểm tra Firebase Authentication và Firestore Rules.";
+}
+
+function showCreatedCredentials({ name, username, password }) {
+  elements.createdStudentName.textContent = name;
+  elements.createdStudentUsername.textContent = username;
+  elements.createdStudentPassword.textContent = password;
+  elements.credentialDialog.showModal();
 }
 
 function randomClassCode() {
@@ -389,15 +433,28 @@ async function handleCreateStudent(event) {
   event.preventDefault();
   const teacher = auth.currentUser;
   if (!teacher) return;
-  const username = elements.studentUsernameInput.value.trim().toLowerCase();
-  const safeUsername = username.replace(/[^a-z0-9._-]/g, "");
-  const studentId = `${teacher.uid}_${safeUsername}`;
+  const safeUsername = normalizeStudentUsername(elements.studentUsernameInput.value);
+  const password = elements.studentPasswordInput.value;
+  const name = elements.studentNameInput.value.trim();
+  if (state.students.some(student => student.username === safeUsername)) {
+    showToast("Tên đăng nhập này đã tồn tại trong hệ thống.");
+    return;
+  }
   elements.createStudentButton.disabled = true;
+  let createdUser = null;
+  let profileCreated = false;
   try {
-    const existing = await getDoc(doc(db, "students", studentId));
-    if (existing.exists()) throw new Error("Tên đăng nhập đã tồn tại trong lớp học.");
-    await setDoc(doc(db, "students", studentId), {
-      name: elements.studentNameInput.value.trim(),
+    await setPersistence(provisioningAuth, inMemoryPersistence);
+    const credential = await createUserWithEmailAndPassword(
+      provisioningAuth,
+      studentUsernameToEmail(safeUsername),
+      password
+    );
+    createdUser = credential.user;
+    await setDoc(doc(db, "students", createdUser.uid), {
+      authUid: createdUser.uid,
+      accountReady: true,
+      name,
       username: safeUsername,
       classCode: elements.studentClassInput.value,
       teacherUid: teacher.uid,
@@ -409,15 +466,16 @@ async function handleCreateStudent(event) {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
+    profileCreated = true;
+    await signOut(provisioningAuth).catch(() => {});
     elements.createStudentForm.reset();
     elements.studentDialog.close();
-    showToast(`Đã thêm học sinh @${safeUsername} ✨`);
+    showCreatedCredentials({ name, username: safeUsername, password });
+    showToast(`Đã tạo tài khoản @${safeUsername} ✨`);
   } catch (error) {
-    if (error.message.includes("đã tồn tại")) showToast(error.message);
-    else {
-      showDataError(error);
-      showToast("Chưa thể thêm học sinh. Hãy kiểm tra Firestore Rules.");
-    }
+    if (createdUser && !profileCreated) await deleteUser(createdUser).catch(() => {});
+    await signOut(provisioningAuth).catch(() => {});
+    showToast(readableStudentAccountError(error));
   } finally {
     elements.createStudentButton.disabled = false;
   }
@@ -447,6 +505,28 @@ function bindEvents() {
     elements.togglePasswordButton.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
   });
 
+  elements.generateStudentPasswordButton.addEventListener("click", generateStudentPassword);
+  elements.toggleStudentPasswordButton.addEventListener("click", () => {
+    const show = elements.studentPasswordInput.type === "password";
+    elements.studentPasswordInput.type = show ? "text" : "password";
+    elements.toggleStudentPasswordButton.textContent = show ? "🙈" : "👁️";
+    elements.toggleStudentPasswordButton.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+  });
+  elements.copyStudentCredentialsButton.addEventListener("click", async () => {
+    const content = `7OIC Vocabulary\nTên đăng nhập: ${elements.createdStudentUsername.textContent}\nMật khẩu: ${elements.createdStudentPassword.textContent}\nTrang học: https://thanh990522.github.io/7oic-vocabulary/`;
+    try {
+      await navigator.clipboard.writeText(content);
+      showToast("Đã sao chép thông tin đăng nhập 📋");
+    } catch {
+      showToast("Không thể tự sao chép. Hãy ghi lại thông tin đang hiển thị.");
+    }
+  });
+  elements.credentialDialog.addEventListener("close", () => {
+    elements.createdStudentName.textContent = "học sinh";
+    elements.createdStudentUsername.textContent = "";
+    elements.createdStudentPassword.textContent = "";
+  });
+
   elements.logoutButton.addEventListener("click", async () => {
     await signOut(auth);
     showToast("Đã đăng xuất khỏi Teacher Dashboard 🔐");
@@ -461,6 +541,7 @@ function bindEvents() {
       switchPanel("classes");
       return;
     }
+    if (dialog === elements.studentDialog && !elements.studentPasswordInput.value) generateStudentPassword();
     dialog?.showModal();
   }));
   document.querySelectorAll("[data-close-dialog]").forEach(button => button.addEventListener("click", () => document.querySelector(`#${button.dataset.closeDialog}`)?.close()));
@@ -473,6 +554,7 @@ function bindEvents() {
 
 bindEvents();
 setPersistence(auth, browserLocalPersistence).catch(() => {});
+setPersistence(provisioningAuth, inMemoryPersistence).catch(() => {});
 onAuthStateChanged(auth, async user => {
   if (!user) {
     showAuthView();
