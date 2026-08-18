@@ -437,3 +437,157 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Readability pass: keep all dashboard text comfortably legible. */
+body {
+  font-size: 17px;
+  line-height: 1.58;
+}
+
+.secure-badge,
+.login-card__kicker,
+.login-form > label,
+.form-message,
+.login-note,
+.teacher-brand small,
+.sidebar-profile small,
+.sidebar-profile span,
+.sidebar-mission small,
+.sidebar-mission p,
+.dashboard-topbar__signal,
+.panel-kicker,
+.metric-card small,
+.metric-card p,
+.dashboard-card__heading small,
+.class-mini-item small,
+.class-code,
+.detail-metric-grid small,
+.detail-section-heading small,
+.progress-summary-grid small,
+.student-theme-item > div small,
+.student-theme-item p,
+.teacher-practice-item > small,
+.activity-count-badge,
+.dialog-heading small,
+.credential-kicker,
+.delete-kicker {
+  font-size: 0.76rem;
+}
+
+.teacher-brand strong,
+.back-to-learning,
+.login-card > p:not(.login-card__kicker):not(.form-message):not(.login-note),
+.password-field input,
+.login-button,
+.sidebar-profile strong,
+.dashboard-nav__item strong,
+.sidebar-mission strong,
+.session-chip,
+.logout-button,
+.data-notice,
+.welcome-panel p,
+.dashboard-card__heading > button,
+.class-mini-item strong,
+.compact-empty p,
+.panel-heading-row p,
+.primary-dashboard-button,
+.class-card p,
+.class-card__bottom span,
+.class-card__bottom strong,
+.class-card__open,
+.dashboard-empty p,
+.dashboard-empty button,
+.student-toolbar input,
+.student-toolbar select,
+.detail-back-button,
+.detail-hero p,
+.detail-code,
+.student-profile-copy p,
+.danger-button,
+.student-info-card dt,
+.student-info-card dd,
+.student-detail-progress strong,
+.student-theme-item > strong,
+.teacher-practice-item > div strong,
+.teacher-practice-item > div em,
+.dashboard-toast {
+  font-size: 0.84rem;
+}
+
+.compact-table {
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.compact-table th {
+  font-size: 0.74rem;
+}
+
+.student-table {
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.student-table th {
+  font-size: 0.74rem;
+}
+
+.mini-avatar,
+.student-avatar {
+  font-size: 0.72rem;
+}
+
+.student-identity strong {
+  font-size: 0.92rem;
+}
+
+.student-identity small,
+.progress-cell strong,
+.status-pill,
+.row-detail-button {
+  font-size: 0.78rem;
+}
+
+.activity-table {
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.activity-table th {
+  font-size: 0.74rem;
+}
+
+.activity-table td > small,
+.activity-result {
+  font-size: 0.76rem;
+}
+
+.dashboard-dialog label {
+  font-size: 0.88rem;
+}
+
+.dashboard-dialog input,
+.dashboard-dialog select,
+.dashboard-dialog textarea {
+  font-size: 1rem;
+}
+
+.credential-sheet > p,
+.credential-box span,
+.delete-sheet > p,
+.delete-sheet .delete-note,
+.dialog-tip {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.credential-box strong {
+  font-size: 1rem;
+}
+
+.credential-actions button,
+.delete-actions button,
+.dialog-actions button,
+.detail-section-heading > button {
+  font-size: 0.86rem;
+}
