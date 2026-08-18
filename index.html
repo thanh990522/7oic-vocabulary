@@ -80,7 +80,7 @@
           <div class="program-label"><span aria-hidden="true">📘</span><div><small>VOCABULARY PROGRAM</small><strong>Oxford Discover Futures 2</strong></div></div>
           <p class="future-hero__eyebrow"><span></span> 7OIC FUTURE LEARNING STATION</p>
           <h1>Vocabulary<br><span>Future Lab</span></h1>
-          <p class="future-hero__lead">Khám phá ngôn ngữ như một nhà khoa học trẻ: quan sát từ vựng, nghe phát âm, ghi nhớ bằng flashcards và mở khóa từng theme.</p>
+          <p class="future-hero__lead">Khám phá ngôn ngữ như một nhà khoa học trẻ: quan sát từ vựng, nghe phát âm, ghi nhớ bằng flashcards và chinh phục Practice Lab.</p>
 
           <div class="future-hero__actions">
             <a class="future-button future-button--primary" href="#theme1"><span>🚀</span> Bắt đầu Theme 1</a>
@@ -152,7 +152,7 @@
       <div class="current-theme-banner__copy">
         <div class="current-theme-banner__eyebrow"><span>ĐANG HỌC</span> Theme 1 of 9</div>
         <h2 id="currentThemeHeading">What is identity?</h2>
-        <p>60 từ vựng · 11 nhóm bài học · IPA và audio · Flashcards tương tác</p>
+        <p>60 từ vựng · 11 nhóm bài học · IPA và audio · Flashcards · Practice Lab</p>
       </div>
       <div class="theme-study-progress" aria-label="Tiến độ luyện flashcards Theme 1">
         <div class="theme-study-progress__top">
@@ -174,6 +174,10 @@
       <button class="tab-button" type="button" data-tab="flashcards" aria-selected="false">
         <span class="tab-icon">🃏</span>
         <span><strong>Flashcards</strong><small>Lật thẻ luyện tập</small></span>
+      </button>
+      <button class="tab-button" type="button" data-tab="practice" aria-selected="false">
+        <span class="tab-icon">🧪</span>
+        <span><strong>Practice Lab</strong><small>4 thử thách · 60 từ</small></span>
       </button>
     </nav>
 
@@ -339,6 +343,126 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <section id="practicePanel" class="tab-panel practice-panel" data-panel="practice" aria-labelledby="practiceHeading" hidden>
+      <div class="section-heading practice-heading">
+        <div>
+          <span class="section-kicker">🧪 VOCABULARY PRACTICE LAB</span>
+          <h2 id="practiceHeading">Luyện đủ 60 từ qua 4 thử thách</h2>
+          <p>Mỗi từ đều xuất hiện trong nối nghĩa, nghe–viết, ngữ cảnh và Speed Quiz.</p>
+        </div>
+        <div class="pet-tip practice-pet-tip" aria-hidden="true"><span>🤖</span> Hoàn thành 4 × 60 lượt từ!</div>
+      </div>
+
+      <div class="practice-coverage-card">
+        <div class="practice-coverage-copy">
+          <span>🚀 THEME 1 MISSION COVERAGE</span>
+          <strong id="practiceOverallLabel">0/240 lượt từ đã hoàn thành</strong>
+          <small>Mỗi dạng bài bao phủ toàn bộ 60 từ vựng.</small>
+        </div>
+        <div class="practice-overall-track" role="progressbar" aria-label="Tiến độ Practice Lab" aria-valuemin="0" aria-valuemax="240" aria-valuenow="0"><span id="practiceOverallBar"></span></div>
+        <div class="practice-coverage-grid">
+          <div><span>🧩</span><small>Nối nghĩa</small><strong id="matchingCoverage">0/60</strong></div>
+          <div><span>🎧</span><small>Nghe–viết</small><strong id="spellingCoverage">0/60</strong></div>
+          <div><span>💬</span><small>Ngữ cảnh</small><strong id="situationCoverage">0/60</strong></div>
+          <div><span>⚡</span><small>Speed Quiz</small><strong id="speedCoverage">0/60</strong></div>
+        </div>
+      </div>
+
+      <nav class="practice-mode-tabs" aria-label="Chọn dạng bài luyện tập">
+        <button class="practice-mode-button is-active" type="button" data-practice-mode="matching"><span>🧩</span><strong>Nối từ</strong><small>10 bộ × 6 từ</small></button>
+        <button class="practice-mode-button" type="button" data-practice-mode="spelling"><span>🎧</span><strong>Nghe & viết</strong><small>60 từ · nghe vô hạn</small></button>
+        <button class="practice-mode-button" type="button" data-practice-mode="situation"><span>💬</span><strong>Ngữ cảnh</strong><small>60 tình huống mới</small></button>
+        <button class="practice-mode-button" type="button" data-practice-mode="speed"><span>⚡</span><strong>Speed Quiz</strong><small>4 mission × 15 câu</small></button>
+      </nav>
+
+      <section class="practice-mode-panel is-active" data-practice-mode-panel="matching" aria-labelledby="matchingHeading">
+        <div class="practice-task-heading">
+          <div><span class="practice-task-icon">🧩</span><div><small>DRAG & DROP</small><h3 id="matchingHeading">Kéo từ vào nghĩa tiếng Việt</h3><p>Kéo thẻ từ bên trái vào nghĩa đúng. Trên điện thoại, chạm từ rồi chạm nghĩa.</p></div></div>
+          <div class="practice-task-controls"><label>Bộ từ<select id="matchingRoundSelect" aria-label="Chọn bộ nối từ"></select></label><button id="shuffleMatchingButton" type="button">🔀 Xáo trộn</button></div>
+        </div>
+        <div class="matching-round-progress"><span>Tiến độ bộ hiện tại</span><strong id="matchingRoundProgress">0/6</strong></div>
+        <div class="matching-board">
+          <div><h4>VOCABULARY CARDS</h4><div id="matchingWordBank" class="matching-word-bank" aria-label="Các từ cần kéo"></div></div>
+          <div><h4>VIETNAMESE MEANINGS</h4><div id="matchingMeaningBank" class="matching-meaning-bank" aria-label="Các nghĩa tiếng Việt"></div></div>
+        </div>
+        <p id="matchingFeedback" class="practice-feedback" role="status" aria-live="polite">Chọn một thẻ từ để bắt đầu.</p>
+      </section>
+
+      <section class="practice-mode-panel" data-practice-mode-panel="spelling" aria-labelledby="spellingHeading" hidden>
+        <div class="practice-task-heading">
+          <div><span class="practice-task-icon practice-task-icon--blue">🎧</span><div><small>LISTEN & SPELL</small><h3 id="spellingHeading">Nghe audio và nhập từ</h3><p>Nhấn nghe lại bao nhiêu lần tùy thích. Dấu gạch nối và khoảng trắng đều được chấp nhận.</p></div></div>
+          <button id="shuffleSpellingButton" class="practice-utility-button" type="button">🔀 Xáo trộn 60 từ</button>
+        </div>
+        <div class="single-question-progress"><span id="spellingPosition">Từ 1/60</span><div><i id="spellingProgressBar"></i></div><strong id="spellingScore">0 đúng</strong></div>
+        <div class="spelling-stage">
+          <div id="spellingIcon" class="spelling-robot" aria-hidden="true">🤖</div>
+          <span id="spellingLesson" class="practice-lesson-chip">Lesson 1</span>
+          <h3>Em nghe thấy từ nào?</h3>
+          <div class="spelling-audio-actions">
+            <button id="spellingAudioButton" type="button"><span>🔊</span><strong>Nghe từ</strong><small>Không giới hạn</small></button>
+            <button id="spellingLettersAudioButton" type="button"><span>🔤</span><strong>Nghe đánh vần</strong><small>A–B–C · không giới hạn</small></button>
+          </div>
+          <form id="spellingForm" class="spelling-form">
+            <label for="spellingInput" class="sr-only">Nhập từ nghe được</label>
+            <input id="spellingInput" type="text" autocomplete="off" spellcheck="false" placeholder="Nhập từ hoặc cụm từ..." required>
+            <button id="checkSpellingButton" type="submit">Kiểm tra ✓</button>
+          </form>
+          <p id="spellingFeedback" class="practice-feedback" role="status" aria-live="polite">Nhấn nút loa, nghe kỹ rồi nhập đáp án.</p>
+          <div class="practice-question-navigation"><button id="previousSpellingButton" type="button">← Từ trước</button><button id="nextSpellingButton" type="button">Từ tiếp theo →</button></div>
+        </div>
+      </section>
+
+      <section class="practice-mode-panel" data-practice-mode-panel="situation" aria-labelledby="situationHeading" hidden>
+        <div class="practice-task-heading">
+          <div><span class="practice-task-icon practice-task-icon--pink">💬</span><div><small>USE IN CONTEXT</small><h3 id="situationHeading">Chọn từ phù hợp với tình huống</h3><p>60 câu ngữ cảnh mới được biên soạn riêng, không sao chép câu ví dụ trong bảng từ.</p></div></div>
+          <button id="shuffleSituationButton" class="practice-utility-button" type="button">🔀 Xáo trộn câu</button>
+        </div>
+        <div class="single-question-progress"><span id="situationPosition">Câu 1/60</span><div><i id="situationProgressBar"></i></div><strong id="situationScore">0 đúng</strong></div>
+        <article class="situation-card">
+          <div class="situation-card__top"><span id="situationIcon">🪪</span><span id="situationLesson" class="practice-lesson-chip">Lesson 1</span></div>
+          <span class="situation-label">CHOOSE THE BEST WORD</span>
+          <h3 id="situationPrompt">A username, face, values, and background can all form part of a person's ____.</h3>
+          <div id="situationOptions" class="situation-options"></div>
+          <p id="situationFeedback" class="practice-feedback" role="status" aria-live="polite">Đọc tình huống và chọn đáp án phù hợp nhất.</p>
+          <button id="nextSituationButton" class="practice-next-button" type="button">Câu tiếp theo →</button>
+        </article>
+      </section>
+
+      <section class="practice-mode-panel" data-practice-mode-panel="speed" aria-labelledby="speedHeading" hidden>
+        <div class="practice-task-heading">
+          <div><span class="practice-task-icon practice-task-icon--yellow">⚡</span><div><small>90-SECOND CHALLENGE</small><h3 id="speedHeading">Speed Quiz – Thử thách tốc độ</h3><p>4 missions, mỗi mission 15 câu trong 90 giây. Hoàn thành cả 4 để gặp đủ 60 từ.</p></div></div>
+        </div>
+        <div id="speedSetup" class="speed-setup">
+          <div class="speed-mission-grid">
+            <button type="button" class="speed-mission-card is-selected" data-speed-mission="0"><span>🚀</span><small>MISSION 1</small><strong>Từ 01–15</strong><em id="speedMissionScore1">Chưa làm</em></button>
+            <button type="button" class="speed-mission-card" data-speed-mission="1"><span>🪐</span><small>MISSION 2</small><strong>Từ 16–30</strong><em id="speedMissionScore2">Chưa làm</em></button>
+            <button type="button" class="speed-mission-card" data-speed-mission="2"><span>🛰️</span><small>MISSION 3</small><strong>Từ 31–45</strong><em id="speedMissionScore3">Chưa làm</em></button>
+            <button type="button" class="speed-mission-card" data-speed-mission="3"><span>🌌</span><small>MISSION 4</small><strong>Từ 46–60</strong><em id="speedMissionScore4">Chưa làm</em></button>
+          </div>
+          <div class="speed-rules"><span>⏱️ 90 giây</span><span>❓ 15 câu</span><span>🏆 +1 điểm/câu</span><span>🔀 Câu hỏi xáo trộn</span></div>
+          <button id="startSpeedButton" class="start-speed-button" type="button">⚡ Bắt đầu Mission 1</button>
+        </div>
+        <div id="speedGame" class="speed-game" hidden>
+          <div class="speed-hud"><div><small>TIME LEFT</small><strong id="speedTimer">90</strong></div><div><small>QUESTION</small><strong id="speedQuestionCount">1/15</strong></div><div><small>SCORE</small><strong id="speedLiveScore">0</strong></div></div>
+          <div class="speed-progress-track"><span id="speedProgressBar"></span></div>
+          <article class="speed-question-card">
+            <span id="speedQuestionType" class="speed-question-type">MEANING CHALLENGE</span>
+            <button id="speedAudioButton" class="speed-audio-button" type="button" hidden>🔊 Nghe lại</button>
+            <h3 id="speedPrompt">Chọn đáp án đúng.</h3>
+            <div id="speedOptions" class="speed-options"></div>
+          </article>
+        </div>
+        <div id="speedResult" class="speed-result" hidden>
+          <span class="speed-result-planet" aria-hidden="true">🏆</span>
+          <small>MISSION COMPLETE</small>
+          <h3 id="speedResultTitle">Tuyệt vời!</h3>
+          <strong id="speedResultScore">0/15</strong>
+          <p id="speedResultMessage">Em đã hoàn thành thử thách.</p>
+          <div><button id="retrySpeedButton" type="button">↻ Làm lại mission</button><button id="nextSpeedMissionButton" type="button">Mission tiếp theo →</button></div>
+        </div>
+      </section>
     </section>
   </main>
 
