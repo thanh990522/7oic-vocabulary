@@ -24,7 +24,7 @@ Dashboard nằm tại `teacher.html`. Giao diện chỉ yêu cầu nhập mật 
 1. Trong **Firebase Console → Authentication → Sign-in method**, bật **Email/Password**.
 2. Trong **Authentication → Users**, tạo tài khoản `hachithanh2251999@gmail.com` và đặt mật khẩu riêng cho giáo viên.
 3. Trong **Firestore Database**, tạo database nếu chưa có.
-4. Mở tab **Rules**, dán toàn bộ nội dung `firestore.rules`, sau đó chọn **Publish**.
+4. Mở đúng **Firestore Database → Rules** (không phải Realtime Database), dán toàn bộ nội dung `firestore.rules`, sau đó chọn **Publish**.
 
 Không lưu mật khẩu trong repository. Dashboard gửi mật khẩu trực tiếp tới Firebase Authentication và chỉ cho phép tài khoản giáo viên đã cấu hình truy cập dữ liệu.
 
