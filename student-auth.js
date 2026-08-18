@@ -8,11 +8,14 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {
+  collection,
   doc,
   getDoc,
   getFirestore,
+  increment,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import {
   firebaseConfig,
@@ -44,6 +47,8 @@ const elements = {
 let activeStudent = null;
 let syncTimer = null;
 let deferredLoginMessage = "";
+let pendingProgress = null;
+const pendingActions = new Map();
 
 function initials(name) {
   return String(name || "HS")
@@ -134,11 +139,18 @@ async function openStudentLearning(user) {
   }).catch(() => setSyncStatus("error", "Chưa đồng bộ"));
 }
 
-async function syncProgress(progress) {
+async function syncProgress() {
   if (!activeStudent || !studentAuth.currentUser) return;
+  const progress = pendingProgress;
+  if (!progress) return;
+  const actions = [...pendingActions.values()];
+  pendingProgress = null;
+  pendingActions.clear();
   setSyncStatus("syncing", "Đang lưu...");
   try {
-    await updateDoc(doc(db, "students", studentAuth.currentUser.uid), {
+    const studentUid = studentAuth.currentUser.uid;
+    const batch = writeBatch(db);
+    batch.update(doc(db, "students", studentUid), {
       "themeProgress.theme1.known": progress.known,
       "themeProgress.theme1.review": progress.review,
       "themeProgress.theme1.practiced": progress.practiced,
@@ -148,8 +160,34 @@ async function syncProgress(progress) {
       lastActive: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
+    actions.forEach(action => {
+      const activityId = action.type === "flashcard"
+        ? `theme${action.themeId}-word-${action.wordId}`
+        : `theme${action.themeId || 1}-${action.type}`;
+      batch.set(doc(collection(db, "students", studentUid, "activity"), activityId), {
+        studentUid,
+        type: action.type,
+        themeId: action.themeId || 1,
+        wordId: action.wordId || null,
+        word: action.word || "",
+        lesson: action.lesson || "",
+        status: action.status || "",
+        attemptCount: increment(action.count || 1),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    });
+    await batch.commit();
     setSyncStatus("", "Đã đồng bộ");
   } catch {
+    pendingProgress = progress;
+    actions.forEach(action => {
+      const newer = pendingActions.get(action.key);
+      pendingActions.set(action.key, {
+        ...action,
+        ...newer,
+        count: (action.count || 0) + (newer?.count || 0)
+      });
+    });
     setSyncStatus("error", "Chưa đồng bộ");
   }
 }
@@ -198,8 +236,16 @@ elements.logoutButton.addEventListener("click", async () => {
 
 document.addEventListener("oic:progress-changed", event => {
   clearTimeout(syncTimer);
-  const progress = event.detail;
-  syncTimer = setTimeout(() => syncProgress(progress), 350);
+  pendingProgress = event.detail;
+  const action = event.detail.action;
+  if (action) {
+    const key = action.type === "flashcard"
+      ? `theme${action.themeId}-word-${action.wordId}`
+      : `theme${action.themeId || 1}-${action.type}`;
+    const existing = pendingActions.get(key);
+    pendingActions.set(key, { ...action, key, count: (existing?.count || 0) + 1 });
+  }
+  syncTimer = setTimeout(syncProgress, 350);
 });
 
 setPersistence(studentAuth, browserLocalPersistence).catch(() => {});
