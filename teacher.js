@@ -14,12 +14,16 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
-  where
+  where,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import {
   firebaseConfig,
@@ -37,8 +41,13 @@ const provisioningAuth = getAuth(provisioningApp);
 const state = {
   classes: [],
   students: [],
+  activity: [],
   unsubscribers: [],
-  activePanel: "overview"
+  activityUnsubscribe: null,
+  activePanel: "overview",
+  selectedClassCode: null,
+  selectedStudentId: null,
+  studentDetailBackPanel: "students"
 };
 
 const elements = {
@@ -68,6 +77,38 @@ const elements = {
   studentClassFilter: document.querySelector("#studentClassFilter"),
   studentTableBody: document.querySelector("#studentTableBody"),
   studentEmptyState: document.querySelector("#studentEmptyState"),
+  backFromClassButton: document.querySelector("#backFromClassButton"),
+  classDetailName: document.querySelector("#classDetailName"),
+  classDetailNote: document.querySelector("#classDetailNote"),
+  classDetailCode: document.querySelector("#classDetailCode"),
+  classDetailStudentCount: document.querySelector("#classDetailStudentCount"),
+  classDetailActiveCount: document.querySelector("#classDetailActiveCount"),
+  classDetailAverage: document.querySelector("#classDetailAverage"),
+  classDetailStudentTable: document.querySelector("#classDetailStudentTable"),
+  classDetailEmpty: document.querySelector("#classDetailEmpty"),
+  backFromStudentButton: document.querySelector("#backFromStudentButton"),
+  studentDetailAvatar: document.querySelector("#studentDetailAvatar"),
+  studentDetailName: document.querySelector("#studentDetailName"),
+  studentDetailUsername: document.querySelector("#studentDetailUsername"),
+  studentDetailClass: document.querySelector("#studentDetailClass"),
+  studentDetailStatus: document.querySelector("#studentDetailStatus"),
+  openDeleteStudentButton: document.querySelector("#openDeleteStudentButton"),
+  studentInfoName: document.querySelector("#studentInfoName"),
+  studentInfoUsername: document.querySelector("#studentInfoUsername"),
+  studentInfoClass: document.querySelector("#studentInfoClass"),
+  studentInfoCreated: document.querySelector("#studentInfoCreated"),
+  studentInfoLastActive: document.querySelector("#studentInfoLastActive"),
+  studentInfoAccount: document.querySelector("#studentInfoAccount"),
+  studentDetailPracticed: document.querySelector("#studentDetailPracticed"),
+  studentDetailKnown: document.querySelector("#studentDetailKnown"),
+  studentDetailReview: document.querySelector("#studentDetailReview"),
+  studentDetailPercent: document.querySelector("#studentDetailPercent"),
+  studentDetailProgressBar: document.querySelector("#studentDetailProgressBar"),
+  studentDetailProgressLabel: document.querySelector("#studentDetailProgressLabel"),
+  studentThemeGrid: document.querySelector("#studentThemeGrid"),
+  activityCountBadge: document.querySelector("#activityCountBadge"),
+  studentActivityTable: document.querySelector("#studentActivityTable"),
+  studentActivityEmpty: document.querySelector("#studentActivityEmpty"),
   classDialog: document.querySelector("#classDialog"),
   createClassForm: document.querySelector("#createClassForm"),
   classNameInput: document.querySelector("#classNameInput"),
@@ -87,14 +128,31 @@ const elements = {
   createdStudentUsername: document.querySelector("#createdStudentUsername"),
   createdStudentPassword: document.querySelector("#createdStudentPassword"),
   copyStudentCredentialsButton: document.querySelector("#copyStudentCredentialsButton"),
+  deleteStudentDialog: document.querySelector("#deleteStudentDialog"),
+  deleteStudentName: document.querySelector("#deleteStudentName"),
+  confirmDeleteStudentButton: document.querySelector("#confirmDeleteStudentButton"),
   dashboardToast: document.querySelector("#dashboardToast")
 };
 
 const PANEL_TITLES = {
   overview: "Tổng quan lớp học",
   classes: "Quản lý lớp học",
-  students: "Tiến độ học sinh"
+  students: "Tiến độ học sinh",
+  "class-detail": "Chi tiết lớp học",
+  "student-detail": "Hồ sơ học sinh"
 };
+
+const THEME_NAMES = [
+  "What is identity?",
+  "How do we discover?",
+  "What makes us healthy?",
+  "How do people create change?",
+  "Why do we tell stories?",
+  "How does technology help us?",
+  "What can we learn from nature?",
+  "How do communities grow?",
+  "What will the future bring?"
+];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -194,11 +252,19 @@ function showDashboardView() {
 function clearSubscriptions() {
   state.unsubscribers.forEach(unsubscribe => unsubscribe());
   state.unsubscribers = [];
+  state.activityUnsubscribe?.();
+  state.activityUnsubscribe = null;
   state.classes = [];
   state.students = [];
+  state.activity = [];
 }
 
 function switchPanel(panelName) {
+  if (panelName !== "student-detail" && state.activityUnsubscribe) {
+    state.activityUnsubscribe();
+    state.activityUnsubscribe = null;
+    state.activity = [];
+  }
   state.activePanel = panelName;
   elements.navButtons.forEach(button => button.classList.toggle("is-active", button.dataset.dashboardPanel === panelName));
   elements.panels.forEach(panel => {
@@ -249,6 +315,14 @@ function classStudentCount(classCode) {
   return state.students.filter(student => student.classCode === classCode).length;
 }
 
+function classByCode(classCode) {
+  return state.classes.find(item => item.id === classCode) || null;
+}
+
+function studentById(studentId) {
+  return state.students.find(item => item.id === studentId) || null;
+}
+
 function renderMetrics() {
   const activeStudents = state.students.filter(isRecentlyActive).length;
   const average = state.students.length
@@ -265,11 +339,11 @@ function renderOverviewClasses() {
   elements.overviewClassEmpty.hidden = items.length > 0;
   elements.overviewClassList.hidden = items.length === 0;
   elements.overviewClassList.innerHTML = items.map(item => `
-    <div class="class-mini-item">
+    <button class="class-mini-item" type="button" data-class-detail="${escapeHtml(item.id)}">
       <span aria-hidden="true">🏫</span>
       <div><strong>${escapeHtml(item.name)}</strong><small>${classStudentCount(item.id)} học sinh</small></div>
       <span class="class-code">${escapeHtml(item.id)}</span>
-    </div>
+    </button>
   `).join("");
 }
 
@@ -282,7 +356,7 @@ function renderRecentStudents() {
   elements.recentStudentTable.innerHTML = items.map(student => {
     const progress = themeOneProgress(student);
     return `
-      <tr>
+      <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="overview">
         <td><div class="mini-person"><span class="mini-avatar">${escapeHtml(initials(student.name))}</span><strong>${escapeHtml(student.name)}</strong></div></td>
         <td>${escapeHtml(student.classCode || "—")}</td>
         <td><div class="mini-progress"><span><i style="width:${progress.percent}%"></i></span><strong>${progress.percent}%</strong></div></td>
@@ -295,12 +369,13 @@ function renderClassCards() {
   elements.classEmptyState.hidden = state.classes.length > 0;
   elements.classCardGrid.hidden = state.classes.length === 0;
   elements.classCardGrid.innerHTML = state.classes.map((item, index) => `
-    <article class="class-card">
+    <button class="class-card" type="button" data-class-detail="${escapeHtml(item.id)}">
       <div class="class-card__top"><span class="class-card__icon">${["🚀", "🪐", "🔬", "🧬"][index % 4]}</span><span class="class-code">${escapeHtml(item.id)}</span></div>
       <h3>${escapeHtml(item.name)}</h3>
       <p>${escapeHtml(item.note || "Lớp học từ vựng Oxford Discover Futures 2.")}</p>
       <div class="class-card__bottom"><span>🧑‍🎓 ${classStudentCount(item.id)} học sinh</span><strong>1/9 THEMES</strong></div>
-    </article>
+      <span class="class-card__open">Xem lớp →</span>
+    </button>
   `).join("");
 }
 
@@ -332,7 +407,7 @@ function renderStudentTable() {
     const progress = themeOneProgress(student);
     const active = isRecentlyActive(student);
     return `
-      <tr>
+      <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="students">
         <td><div class="student-identity"><span class="student-avatar">${escapeHtml(initials(student.name))}</span><div><strong>${escapeHtml(student.name)}</strong><small>@${escapeHtml(student.username || "chưa-có")}</small></div></div></td>
         <td><span class="class-code">${escapeHtml(student.classCode || "—")}</span></td>
         <td class="progress-cell"><div><span><i style="width:${progress.percent}%"></i></span><strong>${progress.practiced}/${progress.total}</strong></div></td>
@@ -340,9 +415,146 @@ function renderStudentTable() {
         <td>🔁 ${progress.review}</td>
         <td>${escapeHtml(formatDate(student.lastActive))}</td>
         <td><span class="status-pill${active ? "" : " status-pill--idle"}">${active ? "Hoạt động" : "Chưa hoạt động"}</span></td>
+        <td><button class="row-detail-button" type="button" data-student-detail="${escapeHtml(student.id)}" data-detail-back="students">Xem →</button></td>
       </tr>
     `;
   }).join("");
+}
+
+function renderClassDetail() {
+  const classroom = classByCode(state.selectedClassCode);
+  if (!classroom) return;
+  const students = state.students.filter(student => student.classCode === classroom.id);
+  const activeCount = students.filter(isRecentlyActive).length;
+  const average = students.length
+    ? Math.round(students.reduce((sum, student) => sum + themeOneProgress(student).percent, 0) / students.length)
+    : 0;
+
+  elements.classDetailName.textContent = classroom.name || "Lớp học";
+  elements.classDetailNote.textContent = classroom.note || "Oxford Discover Futures 2 · 9-theme vocabulary journey";
+  elements.classDetailCode.textContent = classroom.id;
+  elements.classDetailStudentCount.textContent = students.length;
+  elements.classDetailActiveCount.textContent = activeCount;
+  elements.classDetailAverage.textContent = `${average}%`;
+  elements.classDetailEmpty.hidden = students.length > 0;
+  elements.classDetailStudentTable.parentElement.parentElement.hidden = students.length === 0;
+  elements.classDetailStudentTable.innerHTML = students.map(student => {
+    const progress = themeOneProgress(student);
+    return `
+      <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="class-detail">
+        <td><div class="student-identity"><span class="student-avatar">${escapeHtml(initials(student.name))}</span><div><strong>${escapeHtml(student.name)}</strong><small>@${escapeHtml(student.username || "chưa-có")}</small></div></div></td>
+        <td class="progress-cell"><div><span><i style="width:${progress.percent}%"></i></span><strong>${progress.practiced}/${progress.total}</strong></div></td>
+        <td>✅ ${progress.known}</td>
+        <td>🔁 ${progress.review}</td>
+        <td>${escapeHtml(formatDate(student.lastActive))}</td>
+        <td><button class="row-detail-button" type="button" data-student-detail="${escapeHtml(student.id)}" data-detail-back="class-detail">Xem →</button></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function openClassDetail(classCode) {
+  if (!classByCode(classCode)) return;
+  state.selectedClassCode = classCode;
+  renderClassDetail();
+  switchPanel("class-detail");
+}
+
+function renderStudentActivity() {
+  const items = state.activity;
+  elements.activityCountBadge.textContent = `${items.length} hoạt động`;
+  elements.studentActivityEmpty.hidden = items.length > 0;
+  elements.studentActivityTable.parentElement.parentElement.hidden = items.length === 0;
+  elements.studentActivityTable.innerHTML = items.map(item => {
+    const flashcard = item.type === "flashcard";
+    const resultLabels = {
+      known: ["Đã nhớ", "activity-result--known"],
+      review: ["Cần ôn", "activity-result--review"],
+      reset: ["Đặt lại", "activity-result--reset"]
+    };
+    const [result, resultClass] = resultLabels[item.status] || ["Đã luyện", ""];
+    return `
+      <tr>
+        <td>${escapeHtml(formatDate(item.updatedAt))}</td>
+        <td>${flashcard ? "🃏 Flashcard" : "🧹 Đặt lại tiến độ"}</td>
+        <td><strong>${escapeHtml(item.word || "—")}</strong></td>
+        <td>${escapeHtml(item.lesson || `Theme ${item.themeId || 1}`)}</td>
+        <td><span class="activity-result ${resultClass}">${escapeHtml(result)}</span></td>
+        <td>${Math.max(1, Number(item.attemptCount) || 1)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function subscribeStudentActivity(studentId) {
+  state.activityUnsubscribe?.();
+  state.activityUnsubscribe = null;
+  state.activity = [];
+  renderStudentActivity();
+  const activityQuery = query(
+    collection(db, "students", studentId, "activity"),
+    orderBy("updatedAt", "desc"),
+    limit(100)
+  );
+  state.activityUnsubscribe = onSnapshot(activityQuery, snapshot => {
+    hideDataError();
+    state.activity = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+    renderStudentActivity();
+  }, showDataError);
+}
+
+function renderStudentDetail() {
+  const student = studentById(state.selectedStudentId);
+  if (!student) return;
+  const classroom = classByCode(student.classCode);
+  const classLabel = classroom ? `${classroom.name} · ${classroom.id}` : (student.classCode || "Chưa xếp lớp");
+  const progress = themeOneProgress(student);
+  const active = isRecentlyActive(student);
+
+  elements.studentDetailAvatar.textContent = initials(student.name);
+  elements.studentDetailName.textContent = student.name || "Học sinh";
+  elements.studentDetailUsername.textContent = `@${student.username || "chưa-có"}`;
+  elements.studentDetailClass.textContent = classLabel;
+  elements.studentDetailStatus.className = `status-pill${active ? "" : " status-pill--idle"}`;
+  elements.studentDetailStatus.textContent = active ? "Hoạt động" : "Chưa hoạt động";
+  elements.studentInfoName.textContent = student.name || "—";
+  elements.studentInfoUsername.textContent = `@${student.username || "chưa-có"}`;
+  elements.studentInfoClass.textContent = classLabel;
+  elements.studentInfoCreated.textContent = formatDate(student.createdAt);
+  elements.studentInfoLastActive.textContent = formatDate(student.lastActive);
+  elements.studentInfoAccount.textContent = student.accountReady ? "Đã kích hoạt" : "Chưa kích hoạt";
+  elements.studentDetailPracticed.textContent = `${progress.practiced}/${progress.total}`;
+  elements.studentDetailKnown.textContent = progress.known;
+  elements.studentDetailReview.textContent = progress.review;
+  elements.studentDetailPercent.textContent = `${progress.percent}%`;
+  elements.studentDetailProgressBar.style.width = `${progress.percent}%`;
+  elements.studentDetailProgressLabel.textContent = `${progress.percent}% hoàn thành`;
+
+  elements.studentThemeGrid.innerHTML = THEME_NAMES.map((name, index) => {
+    const number = index + 1;
+    const raw = student.themeProgress?.[`theme${number}`] || {};
+    const total = Number(raw.total) || (number === 1 ? 60 : 0);
+    const practiced = Number(raw.practiced) || valueCount(raw.known) + valueCount(raw.review);
+    const percent = total ? Math.min(100, Math.round((practiced / total) * 100)) : 0;
+    const open = number === 1 || total > 0;
+    return `
+      <div class="student-theme-item${open ? " is-open" : " is-locked"}">
+        <div><span>${open ? ["🧬", "🔭", "🫀", "🌱", "📖", "🤖", "🐚", "🏙️", "🚀"][index] : "🔒"}</span><small>THEME ${number}</small></div>
+        <strong>${escapeHtml(name)}</strong>
+        <span class="theme-mini-progress"><i style="width:${percent}%"></i></span>
+        <p>${open ? `${practiced}/${total} từ · ${percent}%` : "Sắp mở khóa"}</p>
+      </div>
+    `;
+  }).join("");
+}
+
+function openStudentDetail(studentId, backPanel = "students") {
+  if (!studentById(studentId)) return;
+  state.selectedStudentId = studentId;
+  state.studentDetailBackPanel = backPanel;
+  renderStudentDetail();
+  subscribeStudentActivity(studentId);
+  switchPanel("student-detail");
 }
 
 function renderDashboard() {
@@ -352,6 +564,8 @@ function renderDashboard() {
   renderClassCards();
   renderClassOptions();
   renderStudentTable();
+  renderClassDetail();
+  renderStudentDetail();
 }
 
 function createThemeProgress() {
@@ -481,6 +695,56 @@ async function handleCreateStudent(event) {
   }
 }
 
+async function handleDeleteStudent() {
+  const student = studentById(state.selectedStudentId);
+  if (!student) return;
+  elements.confirmDeleteStudentButton.disabled = true;
+  elements.confirmDeleteStudentButton.textContent = "⏳ Đang xóa...";
+  try {
+    const activitySnapshot = await getDocs(collection(db, "students", student.id, "activity"));
+    const refs = activitySnapshot.docs.map(item => item.ref);
+    for (let start = 0; start < refs.length; start += 400) {
+      const batch = writeBatch(db);
+      refs.slice(start, start + 400).forEach(ref => batch.delete(ref));
+      await batch.commit();
+    }
+    const profileBatch = writeBatch(db);
+    profileBatch.delete(doc(db, "students", student.id));
+    await profileBatch.commit();
+
+    elements.deleteStudentDialog.close();
+    state.activityUnsubscribe?.();
+    state.activityUnsubscribe = null;
+    state.activity = [];
+    state.selectedStudentId = null;
+    const destination = state.studentDetailBackPanel === "class-detail" && classByCode(state.selectedClassCode)
+      ? "class-detail"
+      : "students";
+    switchPanel(destination);
+    showToast(`Đã xóa hồ sơ và lịch sử của ${student.name} 🗑️`);
+  } catch (error) {
+    showDataError(error);
+    showToast("Chưa thể xóa học sinh. Hãy kiểm tra Firestore Rules.");
+  } finally {
+    elements.confirmDeleteStudentButton.disabled = false;
+    elements.confirmDeleteStudentButton.textContent = "🗑️ Xác nhận xóa";
+  }
+}
+
+function handleDashboardDrilldown(event) {
+  const classTarget = event.target.closest("[data-class-detail]");
+  if (classTarget) {
+    openClassDetail(classTarget.dataset.classDetail);
+    return;
+  }
+  const studentTarget = event.target.closest("[data-student-detail]");
+  if (studentTarget) {
+    const backPanel = studentTarget.dataset.detailBack
+      || (state.activePanel === "class-detail" ? "class-detail" : "students");
+    openStudentDetail(studentTarget.dataset.studentDetail, backPanel);
+  }
+}
+
 function bindEvents() {
   elements.teacherLoginForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -541,7 +805,12 @@ function bindEvents() {
       switchPanel("classes");
       return;
     }
-    if (dialog === elements.studentDialog && !elements.studentPasswordInput.value) generateStudentPassword();
+    if (dialog === elements.studentDialog) {
+      if (!elements.studentPasswordInput.value) generateStudentPassword();
+      if (state.activePanel === "class-detail" && state.selectedClassCode) {
+        elements.studentClassInput.value = state.selectedClassCode;
+      }
+    }
     dialog?.showModal();
   }));
   document.querySelectorAll("[data-close-dialog]").forEach(button => button.addEventListener("click", () => document.querySelector(`#${button.dataset.closeDialog}`)?.close()));
@@ -550,6 +819,27 @@ function bindEvents() {
   elements.createStudentForm.addEventListener("submit", handleCreateStudent);
   elements.studentSearchInput.addEventListener("input", renderStudentTable);
   elements.studentClassFilter.addEventListener("change", renderStudentTable);
+  [
+    elements.overviewClassList,
+    elements.recentStudentTable,
+    elements.classCardGrid,
+    elements.studentTableBody,
+    elements.classDetailStudentTable
+  ].forEach(container => container.addEventListener("click", handleDashboardDrilldown));
+  elements.backFromClassButton.addEventListener("click", () => switchPanel("classes"));
+  elements.backFromStudentButton.addEventListener("click", () => {
+    const destination = state.studentDetailBackPanel === "class-detail" && classByCode(state.selectedClassCode)
+      ? "class-detail"
+      : state.studentDetailBackPanel;
+    switchPanel(PANEL_TITLES[destination] ? destination : "students");
+  });
+  elements.openDeleteStudentButton.addEventListener("click", () => {
+    const student = studentById(state.selectedStudentId);
+    if (!student) return;
+    elements.deleteStudentName.textContent = student.name || "học sinh";
+    elements.deleteStudentDialog.showModal();
+  });
+  elements.confirmDeleteStudentButton.addEventListener("click", handleDeleteStudent);
 }
 
 bindEvents();
