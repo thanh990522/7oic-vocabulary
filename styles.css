@@ -375,12 +375,27 @@ button {
   padding: 9px 13px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
+  color: #fff;
   background: rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+.school-ribbon__teacher:hover,
+.school-ribbon__teacher:focus-visible {
+  border-color: rgba(142, 234, 255, 0.65);
+  background: rgba(105, 90, 255, 0.2);
+  box-shadow: 0 0 24px rgba(86, 221, 255, 0.16);
+  transform: translateY(-2px);
 }
 .school-ribbon__teacher > span { font-size: 1.8rem; }
 .school-ribbon__teacher div { display: flex; flex-direction: column; }
 .school-ribbon__teacher small { color: #ffd77c; font-size: 0.56rem; font-weight: 900; letter-spacing: 0.15em; }
 .school-ribbon__teacher strong { font-size: 0.86rem; }
+.school-ribbon__teacher .teacher-dashboard-lock {
+  margin-left: auto;
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 124, 0.42));
+}
 
 .future-hero__body {
   display: grid;
@@ -1300,6 +1315,15 @@ kbd { padding: 2px 6px; border: 1px solid #d5cee9; border-radius: 6px; backgroun
 }
 .footer-institution strong { color: var(--purple-dark); }
 .footer-institution span { font-size: 0.76rem; font-weight: 800; }
+.footer-dashboard-link {
+  margin-top: 3px;
+  color: #5d4ddd;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+.footer-dashboard-link:hover,
+.footer-dashboard-link:focus-visible { text-decoration: underline; }
 .footer-icons { letter-spacing: 5px; }
 
 .toast {
