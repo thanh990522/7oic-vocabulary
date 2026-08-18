@@ -10,3 +10,15 @@ export const firebaseConfig = {
 
 export const TEACHER_EMAIL = "hachithanh2251999@gmail.com";
 export const FIREBASE_SDK_VERSION = "12.17.1";
+export const STUDENT_EMAIL_DOMAIN = "students.oic-vocabulary.firebaseapp.com";
+
+export function normalizeStudentUsername(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "");
+}
+
+export function studentUsernameToEmail(username) {
+  return `${normalizeStudentUsername(username)}@${STUDENT_EMAIL_DOMAIN}`;
+}
