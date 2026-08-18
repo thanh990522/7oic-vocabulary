@@ -177,10 +177,32 @@
       <div class="dialog-heading"><div><span>🧑‍🎓</span><div><small>NEW STUDENT</small><h2>Thêm học sinh</h2></div></div><button type="button" data-close-dialog="studentDialog" aria-label="Đóng">×</button></div>
       <label>Họ và tên<input id="studentNameInput" name="studentName" required maxlength="70" placeholder="Nguyễn Văn An"></label>
       <label>Tên đăng nhập<input id="studentUsernameInput" name="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9._-]+" placeholder="nguyenvanan"></label>
+      <label>Mật khẩu học sinh
+        <span class="student-password-field">
+          <input id="studentPasswordInput" name="studentPassword" type="password" required minlength="6" maxlength="30" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự">
+          <button id="generateStudentPasswordButton" type="button" title="Tạo mật khẩu mạnh">🎲</button>
+          <button id="toggleStudentPasswordButton" type="button" aria-label="Hiện mật khẩu">👁️</button>
+        </span>
+      </label>
       <label>Lớp<select id="studentClassInput" name="classCode" required><option value="">Chọn lớp học</option></select></label>
-      <p class="dialog-tip">🧠 Học sinh mới bắt đầu với tiến độ 0/60 từ ở Theme 1.</p>
-      <div class="dialog-actions"><button type="button" data-close-dialog="studentDialog">Hủy</button><button id="createStudentButton" type="submit">✨ Thêm học sinh</button></div>
+      <p class="dialog-tip">🔐 Mật khẩu chỉ hiển thị sau khi tạo và không được lưu trong cơ sở dữ liệu.</p>
+      <div class="dialog-actions"><button type="button" data-close-dialog="studentDialog">Hủy</button><button id="createStudentButton" type="submit">✨ Tạo tài khoản</button></div>
     </form>
+  </dialog>
+
+  <dialog id="credentialDialog" class="dashboard-dialog credential-dialog">
+    <div class="credential-sheet">
+      <div class="credential-success" aria-hidden="true">🎉</div>
+      <span class="credential-kicker">STUDENT ACCOUNT READY</span>
+      <h2>Đã tạo tài khoản học sinh</h2>
+      <p>Gửi thông tin dưới đây cho <strong id="createdStudentName">học sinh</strong>. Mật khẩu sẽ không được lưu lại sau khi đóng cửa sổ này.</p>
+      <div class="credential-box"><span>Tên đăng nhập</span><strong id="createdStudentUsername">username</strong></div>
+      <div class="credential-box"><span>Mật khẩu</span><strong id="createdStudentPassword">••••••••</strong></div>
+      <div class="credential-actions">
+        <button id="copyStudentCredentialsButton" type="button">📋 Sao chép thông tin</button>
+        <button type="button" data-close-dialog="credentialDialog">Hoàn tất</button>
+      </div>
+    </div>
   </dialog>
 
   <div id="dashboardToast" class="dashboard-toast" role="status" aria-live="polite"></div>
