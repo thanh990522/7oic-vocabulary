@@ -1408,14 +1408,13 @@ kbd { padding: 2px 6px; border: 1px solid #d5cee9; border-radius: 6px; backgroun
 .matching-board > div { padding: 13px; border: 1px solid var(--line); border-radius: 17px; background: #faf9fd; }
 .matching-board h4 { margin: 0 0 9px; color: var(--muted); font-size: .52rem; letter-spacing: .11em; }
 .matching-word-bank,.matching-meaning-bank { display: grid; gap: 8px; }
-.matching-word { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 8px; min-height: 60px; padding: 8px 10px; border: 2px solid #dcd5f5; border-radius: 13px; color: var(--ink); background: #fff; box-shadow: 0 4px 10px rgba(78,53,183,.07); cursor: grab; text-align: left; transition: .17s ease; }
+.matching-word { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 8px; min-height: 60px; padding: 8px 10px; border: 2px solid #dcd5f5; border-radius: 13px; color: var(--ink); background: #fff; box-shadow: 0 4px 10px rgba(78,53,183,.07); cursor: pointer; text-align: left; transition: .17s ease; }
 .matching-word:hover,.matching-word.is-selected { border-color: var(--purple); background: #f5f1ff; transform: translateY(-2px); }
-.matching-word.is-dragging { opacity: .5; transform: scale(.97); }
 .matching-word > span { grid-row: 1 / 3; font-size: 1.3rem; }
 .matching-word strong { align-self: end; color: var(--purple-dark); font-size: .7rem; }
 .matching-word small { align-self: start; color: var(--muted); font-size: .54rem; }
 .matching-meaning { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 9px; min-height: 60px; padding: 8px 11px; border: 2px dashed #d6d0e8; border-radius: 13px; color: var(--ink); background: #fff; cursor: pointer; text-align: left; transition: .17s ease; }
-.matching-meaning:hover,.matching-meaning.is-dragover { border-color: var(--blue); background: var(--blue-soft); transform: translateX(2px); }
+.matching-meaning:hover,.matching-meaning.is-ready { border-color: var(--blue); background: var(--blue-soft); transform: translateX(2px); }
 .matching-meaning.is-matched { border-style: solid; border-color: #a8eadc; background: var(--mint-soft); cursor: default; }
 .matching-meaning.is-wrong { border-color: #ff91b5; background: var(--pink-soft); animation: practiceShake .35s ease; }
 .matching-drop-icon { font-size: 1.15rem; }
@@ -1465,6 +1464,7 @@ kbd { padding: 2px 6px; border: 1px solid #d5cee9; border-radius: 6px; backgroun
 
 .speed-setup { padding: 17px; border-radius: 19px; background: linear-gradient(145deg,#f9f7ff,#eef8ff); }
 .speed-mission-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; }
+.speed-mission-grid--single { grid-template-columns: minmax(280px,480px); justify-content: center; }
 .speed-mission-card { display: flex; min-height: 135px; align-items: center; flex-direction: column; padding: 12px 8px; border: 2px solid var(--line); border-radius: 16px; color: var(--ink); background: #fff; cursor: pointer; transition: .18s ease; }
 .speed-mission-card:hover,.speed-mission-card.is-selected { border-color: var(--purple); box-shadow: var(--shadow-small); transform: translateY(-3px); }
 .speed-mission-card.is-selected { color: #fff; background: linear-gradient(145deg,var(--purple),#8e70f5); }

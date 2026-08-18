@@ -37,6 +37,12 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provisioningApp = initializeApp(firebaseConfig, "student-provisioning");
 const provisioningAuth = getAuth(provisioningApp);
+const PRACTICE_ASSIGNMENTS = {
+  matching: [1, 15],
+  spelling: [16, 30],
+  situation: [31, 45],
+  speed: [46, 60]
+};
 
 const state = {
   classes: [],
@@ -176,6 +182,11 @@ function initials(name) {
 function valueCount(value) {
   if (Array.isArray(value)) return value.length;
   return Number(value) || 0;
+}
+
+function practiceRangeCount(value, [start, end]) {
+  if (!Array.isArray(value)) return 0;
+  return new Set(value.map(Number).filter(id => Number.isInteger(id) && id >= start && id <= end)).size;
 }
 
 function themeOneProgress(student) {
@@ -550,17 +561,17 @@ function renderStudentDetail() {
 
   const practice = student.themeProgress?.theme1?.practice || {};
   const practiceItems = [
-    ["🧩", "Nối từ với nghĩa", valueCount(practice.matching?.completedWords)],
-    ["🎧", "Nghe & viết từ", valueCount(practice.spelling?.completedWords)],
-    ["💬", "Chọn từ theo ngữ cảnh", valueCount(practice.situation?.completedWords)],
-    ["⚡", "Speed Quiz", valueCount(practice.speed?.completedWords)]
+    ["🧩", "Matching · từ 01–15", practiceRangeCount(practice.matching?.completedWords, PRACTICE_ASSIGNMENTS.matching)],
+    ["🎧", "Nghe & viết · từ 16–30", practiceRangeCount(practice.spelling?.completedWords, PRACTICE_ASSIGNMENTS.spelling)],
+    ["💬", "Ngữ cảnh · từ 31–45", practiceRangeCount(practice.situation?.completedWords, PRACTICE_ASSIGNMENTS.situation)],
+    ["⚡", "Speed Quiz · từ 46–60", practiceRangeCount(practice.speed?.completedWords, PRACTICE_ASSIGNMENTS.speed)]
   ];
   elements.studentPracticeGrid.innerHTML = practiceItems.map(([icon, label, completed]) => {
-    const safeCompleted = Math.min(60, Number(completed) || 0);
-    const percent = Math.round((safeCompleted / 60) * 100);
+    const safeCompleted = Math.min(15, Number(completed) || 0);
+    const percent = Math.round((safeCompleted / 15) * 100);
     return `
       <div class="teacher-practice-item">
-        <div><span>${icon}</span><strong>${escapeHtml(label)}</strong><em>${safeCompleted}/60</em></div>
+        <div><span>${icon}</span><strong>${escapeHtml(label)}</strong><em>${safeCompleted}/15</em></div>
         <span class="teacher-practice-track"><i style="width:${percent}%"></i></span>
         <small>${percent}% từ đã thực hành</small>
       </div>

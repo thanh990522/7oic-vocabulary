@@ -75,6 +75,19 @@ const VOCABULARY = [
   { id: 60, lesson: "14–15", title: "Someone I look up to", word: "admire", speak: "admire", ipa: "/ədˈmaɪə/", pos: "V", meaning: "Ngưỡng mộ; khâm phục", example: "Search online for information about a person you admire.", icon: "💖" }
 ];
 
+const PRACTICE_MODES = ["matching", "spelling", "situation", "speed"];
+const PRACTICE_GROUP_SIZE = Math.ceil(VOCABULARY.length / PRACTICE_MODES.length);
+const MATCHING_ROUND_SIZE = 5;
+const PRACTICE_ITEMS = Object.fromEntries(PRACTICE_MODES.map((mode, index) => [
+  mode,
+  VOCABULARY.slice(index * PRACTICE_GROUP_SIZE, (index + 1) * PRACTICE_GROUP_SIZE)
+]));
+const PRACTICE_ID_SETS = Object.fromEntries(PRACTICE_MODES.map(mode => [
+  mode,
+  new Set(PRACTICE_ITEMS[mode].map(item => item.id))
+]));
+const MATCHING_ROUND_COUNT = Math.ceil(PRACTICE_ITEMS.matching.length / MATCHING_ROUND_SIZE);
+
 const SITUATIONS = [
   "A username, face, values, and background can all form part of a person's ____.",
   "The police used a clear photograph to ____ the missing traveller.",
@@ -239,7 +252,7 @@ const elements = {
   nextSituationButton: document.querySelector("#nextSituationButton"),
   speedSetup: document.querySelector("#speedSetup"),
   speedMissionCards: [...document.querySelectorAll("[data-speed-mission]")],
-  speedMissionScores: [1, 2, 3, 4].map(number => document.querySelector(`#speedMissionScore${number}`)),
+  speedMissionScores: [document.querySelector("#speedMissionScore1")],
   startSpeedButton: document.querySelector("#startSpeedButton"),
   speedGame: document.querySelector("#speedGame"),
   speedTimer: document.querySelector("#speedTimer"),
@@ -369,8 +382,13 @@ function shuffle(items) {
   return copy;
 }
 
-function numericSet(value) {
-  return new Set((Array.isArray(value) ? value : []).map(Number).filter(number => Number.isInteger(number) && number >= 1 && number <= VOCABULARY.length));
+function numericSet(value, allowedIds = null) {
+  return new Set((Array.isArray(value) ? value : []).map(Number).filter(number =>
+    Number.isInteger(number)
+    && number >= 1
+    && number <= VOCABULARY.length
+    && (!allowedIds || allowedIds.has(number))
+  ));
 }
 
 function createPracticeState(progress = {}) {
@@ -378,28 +396,32 @@ function createPracticeState(progress = {}) {
   const spelling = progress.spelling || {};
   const situation = progress.situation || {};
   const speed = progress.speed || {};
+  const legacySpeedScores = speed.bestScores || {};
+  const assignedSpeedBest = Number(legacySpeedScores.mission4 ?? legacySpeedScores.mission1) || 0;
   return {
     activeMode: "matching",
     matchingRound: 0,
     matchingSelectedId: null,
     matchingOrders: {},
-    matchingCompleted: numericSet(matching.completedWords),
-    matchingRounds: numericSet(matching.roundsCompleted),
-    spellingOrder: VOCABULARY.map(item => item.id),
+    matchingCompleted: numericSet(matching.completedWords, PRACTICE_ID_SETS.matching),
+    matchingRounds: new Set((Array.isArray(matching.roundsCompleted) ? matching.roundsCompleted : [])
+      .map(Number)
+      .filter(round => Number.isInteger(round) && round >= 1 && round <= MATCHING_ROUND_COUNT)),
+    spellingOrder: PRACTICE_ITEMS.spelling.map(item => item.id),
     spellingIndex: 0,
-    spellingCompleted: numericSet(spelling.completedWords),
-    spellingCorrect: numericSet(spelling.correctWords),
+    spellingCompleted: numericSet(spelling.completedWords, PRACTICE_ID_SETS.spelling),
+    spellingCorrect: numericSet(spelling.correctWords, PRACTICE_ID_SETS.spelling),
     spellingFeedback: "Nhấn nút loa, nghe kỹ rồi nhập đáp án.",
     spellingFeedbackType: "",
-    situationOrder: VOCABULARY.map(item => item.id),
+    situationOrder: PRACTICE_ITEMS.situation.map(item => item.id),
     situationIndex: 0,
-    situationCompleted: numericSet(situation.completedWords),
-    situationCorrect: numericSet(situation.correctWords),
+    situationCompleted: numericSet(situation.completedWords, PRACTICE_ID_SETS.situation),
+    situationCorrect: numericSet(situation.correctWords, PRACTICE_ID_SETS.situation),
     situationOptions: {},
     situationLocked: false,
     situationSelectedId: null,
-    speedCompleted: numericSet(speed.completedWords),
-    speedBestScores: { ...(speed.bestScores || {}) },
+    speedCompleted: numericSet(speed.completedWords, PRACTICE_ID_SETS.speed),
+    speedBestScores: assignedSpeedBest ? { mission1: assignedSpeedBest } : {},
     speedMission: 0,
     speedQuestions: [],
     speedIndex: 0,
@@ -453,30 +475,38 @@ function updatePracticeProgress() {
     state.practice.situationCompleted.size,
     state.practice.speedCompleted.size
   ];
-  const complete = counts.reduce((sum, count) => sum + count, 0);
-  const percent = Math.round((complete / (VOCABULARY.length * 4)) * 100);
-  elements.practiceOverallLabel.textContent = `${complete}/${VOCABULARY.length * 4} lượt từ đã hoàn thành`;
+  const coveredWords = new Set([
+    ...state.practice.matchingCompleted,
+    ...state.practice.spellingCompleted,
+    ...state.practice.situationCompleted,
+    ...state.practice.speedCompleted
+  ]);
+  const complete = coveredWords.size;
+  const percent = Math.round((complete / VOCABULARY.length) * 100);
+  elements.practiceOverallLabel.textContent = `${complete}/${VOCABULARY.length} từ đã được thực hành`;
   elements.practiceOverallBar.style.width = `${percent}%`;
   elements.practiceOverallTrack.setAttribute("aria-valuenow", String(complete));
-  elements.matchingCoverage.textContent = `${counts[0]}/${VOCABULARY.length}`;
-  elements.spellingCoverage.textContent = `${counts[1]}/${VOCABULARY.length}`;
-  elements.situationCoverage.textContent = `${counts[2]}/${VOCABULARY.length}`;
-  elements.speedCoverage.textContent = `${counts[3]}/${VOCABULARY.length}`;
+  elements.matchingCoverage.textContent = `${counts[0]}/${PRACTICE_ITEMS.matching.length}`;
+  elements.spellingCoverage.textContent = `${counts[1]}/${PRACTICE_ITEMS.spelling.length}`;
+  elements.situationCoverage.textContent = `${counts[2]}/${PRACTICE_ITEMS.situation.length}`;
+  elements.speedCoverage.textContent = `${counts[3]}/${PRACTICE_ITEMS.speed.length}`;
   elements.speedMissionScores.forEach((element, index) => {
+    if (!element) return;
     const score = state.practice.speedBestScores[`mission${index + 1}`];
     element.textContent = Number.isFinite(Number(score)) ? `Kỷ lục ${score}/15` : "Chưa làm";
   });
 }
 
 function populateMatchingRounds() {
-  elements.matchingRoundSelect.innerHTML = Array.from({ length: Math.ceil(VOCABULARY.length / 6) }, (_, index) =>
-    `<option value="${index}">Bộ ${index + 1} · Từ ${String(index * 6 + 1).padStart(2, "0")}–${String(Math.min(index * 6 + 6, VOCABULARY.length)).padStart(2, "0")}</option>`
-  ).join("");
+  elements.matchingRoundSelect.innerHTML = Array.from({ length: MATCHING_ROUND_COUNT }, (_, index) => {
+    const items = PRACTICE_ITEMS.matching.slice(index * MATCHING_ROUND_SIZE, (index + 1) * MATCHING_ROUND_SIZE);
+    return `<option value="${index}">Bộ ${index + 1} · Từ ${String(items[0].id).padStart(2, "0")}–${String(items.at(-1).id).padStart(2, "0")}</option>`;
+  }).join("");
 }
 
 function matchingRoundItems() {
-  const start = state.practice.matchingRound * 6;
-  return VOCABULARY.slice(start, start + 6);
+  const start = state.practice.matchingRound * MATCHING_ROUND_SIZE;
+  return PRACTICE_ITEMS.matching.slice(start, start + MATCHING_ROUND_SIZE);
 }
 
 function matchingWordOrder() {
@@ -496,16 +526,16 @@ function renderMatching() {
   elements.matchingWordBank.innerHTML = order.map(id => VOCABULARY.find(item => item.id === id))
     .filter(item => item && !state.practice.matchingCompleted.has(item.id))
     .map(item => `
-      <button class="matching-word${state.practice.matchingSelectedId === item.id ? " is-selected" : ""}" type="button" draggable="true" data-match-word="${item.id}">
+      <button class="matching-word${state.practice.matchingSelectedId === item.id ? " is-selected" : ""}" type="button" data-match-word="${item.id}" aria-pressed="${state.practice.matchingSelectedId === item.id}">
         <span>${item.icon}</span><strong>${escapeHtml(item.word)}</strong><small>${escapeHtml(item.ipa)}</small>
       </button>
     `).join("") || '<div class="matching-complete-badge">🎉 Hoàn thành bộ từ!</div>';
   elements.matchingMeaningBank.innerHTML = items.map(item => {
     const isMatched = state.practice.matchingCompleted.has(item.id);
     return `
-      <button class="matching-meaning${isMatched ? " is-matched" : ""}" type="button" data-match-target="${item.id}" ${isMatched ? "disabled" : ""}>
-        <span class="matching-drop-icon">${isMatched ? "✅" : "⬇️"}</span>
-        <span><strong>${escapeHtml(item.meaning)}</strong>${isMatched ? `<small>${escapeHtml(item.word)}</small>` : "<small>Thả từ vào đây</small>"}</span>
+      <button class="matching-meaning${isMatched ? " is-matched" : state.practice.matchingSelectedId ? " is-ready" : ""}" type="button" data-match-target="${item.id}" ${isMatched ? "disabled" : ""}>
+        <span class="matching-drop-icon">${isMatched ? "✅" : "🔗"}</span>
+        <span><strong>${escapeHtml(item.meaning)}</strong>${isMatched ? `<small>${escapeHtml(item.word)}</small>` : "<small>Chọn nghĩa này</small>"}</span>
       </button>
     `;
   }).join("");
@@ -516,7 +546,7 @@ function renderMatching() {
     elements.matchingFeedback.className = "practice-feedback";
     elements.matchingFeedback.textContent = state.practice.matchingSelectedId
       ? `Đã chọn “${VOCABULARY.find(item => item.id === state.practice.matchingSelectedId)?.word}”. Bây giờ chọn nghĩa phù hợp.`
-      : "Kéo một thẻ từ vào nghĩa đúng hoặc chạm để chọn.";
+      : "Chọn một thẻ từ bên trái, sau đó chọn nghĩa tương ứng bên phải.";
   }
 }
 
@@ -550,15 +580,16 @@ function tryMatch(wordId, targetId) {
       coverageCount: state.practice.matchingCompleted.size
     });
     celebrate();
-    showToast(`Hoàn thành Bộ ${state.practice.matchingRound + 1}! ${state.practice.matchingCompleted.size}/60 từ đã được nối 🎉`);
+    showToast(`Hoàn thành Bộ ${state.practice.matchingRound + 1}! ${state.practice.matchingCompleted.size}/${PRACTICE_ITEMS.matching.length} từ đã được nối 🎉`);
   }
   renderMatching();
   updatePracticeProgress();
 }
 
 function currentSpellingItem() {
-  const id = state.practice.spellingOrder[state.practice.spellingIndex] || 1;
-  return VOCABULARY.find(item => item.id === id) || VOCABULARY[0];
+  const fallback = PRACTICE_ITEMS.spelling[0];
+  const id = state.practice.spellingOrder[state.practice.spellingIndex] || fallback.id;
+  return VOCABULARY.find(item => item.id === id) || fallback;
 }
 
 function normalizeAnswer(value) {
@@ -596,8 +627,9 @@ function spellOutText(item) {
 function renderSpelling() {
   const item = currentSpellingItem();
   const position = state.practice.spellingIndex + 1;
-  elements.spellingPosition.textContent = `Từ ${position}/${VOCABULARY.length}`;
-  elements.spellingProgressBar.style.width = `${Math.round((position / VOCABULARY.length) * 100)}%`;
+  const total = PRACTICE_ITEMS.spelling.length;
+  elements.spellingPosition.textContent = `Từ ${position}/${total}`;
+  elements.spellingProgressBar.style.width = `${Math.round((position / total) * 100)}%`;
   elements.spellingScore.textContent = `${state.practice.spellingCorrect.size} đúng`;
   elements.spellingIcon.textContent = item.icon;
   elements.spellingLesson.textContent = `Lesson ${item.lesson}`;
@@ -605,11 +637,11 @@ function renderSpelling() {
   elements.spellingFeedback.textContent = state.practice.spellingFeedback;
   elements.spellingInput.value = "";
   elements.previousSpellingButton.disabled = state.practice.spellingIndex === 0;
-  elements.nextSpellingButton.disabled = state.practice.spellingIndex === VOCABULARY.length - 1;
+  elements.nextSpellingButton.disabled = state.practice.spellingIndex === total - 1;
 }
 
 function moveSpelling(direction) {
-  state.practice.spellingIndex = Math.max(0, Math.min(VOCABULARY.length - 1, state.practice.spellingIndex + direction));
+  state.practice.spellingIndex = Math.max(0, Math.min(PRACTICE_ITEMS.spelling.length - 1, state.practice.spellingIndex + direction));
   state.practice.spellingFeedback = "Nhấn nút loa, nghe kỹ rồi nhập đáp án.";
   state.practice.spellingFeedbackType = "";
   renderSpelling();
@@ -649,20 +681,21 @@ function checkSpelling(event) {
   updatePracticeProgress();
 }
 
-function distractorItems(item, count = 3) {
-  const sameForm = VOCABULARY.filter(candidate => candidate.id !== item.id && candidate.pos === item.pos);
-  const others = VOCABULARY.filter(candidate => candidate.id !== item.id && candidate.pos !== item.pos);
+function distractorItems(item, count = 3, pool = VOCABULARY) {
+  const sameForm = pool.filter(candidate => candidate.id !== item.id && candidate.pos === item.pos);
+  const others = pool.filter(candidate => candidate.id !== item.id && candidate.pos !== item.pos);
   return shuffle([...sameForm, ...others]).slice(0, count);
 }
 
 function currentSituationItem() {
-  const id = state.practice.situationOrder[state.practice.situationIndex] || 1;
-  return VOCABULARY.find(item => item.id === id) || VOCABULARY[0];
+  const fallback = PRACTICE_ITEMS.situation[0];
+  const id = state.practice.situationOrder[state.practice.situationIndex] || fallback.id;
+  return VOCABULARY.find(item => item.id === id) || fallback;
 }
 
 function situationOptionIds(item) {
   if (!state.practice.situationOptions[item.id]) {
-    state.practice.situationOptions[item.id] = shuffle([item, ...distractorItems(item)]).map(option => option.id);
+    state.practice.situationOptions[item.id] = shuffle([item, ...distractorItems(item, 3, PRACTICE_ITEMS.situation)]).map(option => option.id);
   }
   return state.practice.situationOptions[item.id];
 }
@@ -670,8 +703,9 @@ function situationOptionIds(item) {
 function renderSituation() {
   const item = currentSituationItem();
   const position = state.practice.situationIndex + 1;
-  elements.situationPosition.textContent = `Câu ${position}/${VOCABULARY.length}`;
-  elements.situationProgressBar.style.width = `${Math.round((position / VOCABULARY.length) * 100)}%`;
+  const total = PRACTICE_ITEMS.situation.length;
+  elements.situationPosition.textContent = `Câu ${position}/${total}`;
+  elements.situationProgressBar.style.width = `${Math.round((position / total) * 100)}%`;
   elements.situationScore.textContent = `${state.practice.situationCorrect.size} đúng`;
   elements.situationIcon.textContent = item.icon;
   elements.situationLesson.textContent = `Lesson ${item.lesson}`;
@@ -688,7 +722,7 @@ function renderSituation() {
     elements.situationFeedback.textContent = "Đọc tình huống và chọn đáp án phù hợp nhất.";
   }
   elements.nextSituationButton.disabled = !state.practice.situationLocked;
-  elements.nextSituationButton.textContent = state.practice.situationIndex === VOCABULARY.length - 1 ? "Hoàn thành ✓" : "Câu tiếp theo →";
+  elements.nextSituationButton.textContent = state.practice.situationIndex === total - 1 ? "Hoàn thành ✓" : "Câu tiếp theo →";
 }
 
 function answerSituation(answerId) {
@@ -727,13 +761,14 @@ function answerSituation(answerId) {
 }
 
 function nextSituation() {
-  if (!state.practice.situationLocked && state.practice.situationIndex < VOCABULARY.length - 1) return;
-  if (state.practice.situationIndex === VOCABULARY.length - 1) {
-    if (state.practice.situationCompleted.size === VOCABULARY.length) {
+  const total = PRACTICE_ITEMS.situation.length;
+  if (!state.practice.situationLocked && state.practice.situationIndex < total - 1) return;
+  if (state.practice.situationIndex === total - 1) {
+    if (state.practice.situationCompleted.size === total) {
       celebrate();
-      showToast(`Hoàn thành 60 tình huống với ${state.practice.situationCorrect.size} từ đúng! 🌟`);
+      showToast(`Hoàn thành ${total} tình huống với ${state.practice.situationCorrect.size} câu đúng! 🌟`);
     } else {
-      showToast(`Em đã đi đến cuối bộ. Đã làm ${state.practice.situationCompleted.size}/60 tình huống.`);
+      showToast(`Em đã đi đến cuối bộ. Đã làm ${state.practice.situationCompleted.size}/${total} tình huống.`);
     }
     return;
   }
@@ -744,12 +779,12 @@ function nextSituation() {
 }
 
 function speedMissionItems(mission) {
-  return VOCABULARY.slice(mission * 15, mission * 15 + 15);
+  return PRACTICE_ITEMS.speed;
 }
 
 function buildSpeedQuestion(item) {
   const mode = item.id % 3;
-  const optionItems = shuffle([item, ...distractorItems(item)]);
+  const optionItems = shuffle([item, ...distractorItems(item, 3, PRACTICE_ITEMS.speed)]);
   if (mode === 0) {
     return {
       item,
@@ -779,10 +814,10 @@ function buildSpeedQuestion(item) {
 
 function selectSpeedMission(mission) {
   if (state.practice.speedActive) return;
-  state.practice.speedMission = Number(mission);
+  state.practice.speedMission = 0;
   state.practice.speedShowingResult = false;
-  elements.speedMissionCards.forEach(card => card.classList.toggle("is-selected", Number(card.dataset.speedMission) === state.practice.speedMission));
-  elements.startSpeedButton.textContent = `⚡ Bắt đầu Mission ${state.practice.speedMission + 1}`;
+  elements.speedMissionCards.forEach(card => card.classList.add("is-selected"));
+  elements.startSpeedButton.textContent = "⚡ Bắt đầu Speed Quiz";
   elements.speedSetup.hidden = false;
   elements.speedGame.hidden = true;
   elements.speedResult.hidden = true;
@@ -868,7 +903,7 @@ function finishSpeedQuiz(timedOut) {
   state.practice.speedActive = false;
   state.practice.speedShowingResult = true;
   state.practice.speedTimedOut = timedOut;
-  const missionKey = `mission${state.practice.speedMission + 1}`;
+  const missionKey = "mission1";
   const previousBest = Number(state.practice.speedBestScores[missionKey]) || 0;
   state.practice.speedBestScores[missionKey] = Math.max(previousBest, state.practice.speedScore);
   const duration = Math.min(90, Math.max(1, Math.round((Date.now() - state.practice.speedStartedAt) / 1000)));
@@ -878,14 +913,14 @@ function finishSpeedQuiz(timedOut) {
   elements.speedResultTitle.textContent = state.practice.speedScore >= 13 ? "Siêu tốc độ!" : state.practice.speedScore >= 9 ? "Làm rất tốt!" : "Tiếp tục luyện nhé!";
   elements.speedResultMessage.textContent = timedOut
     ? `Hết 90 giây · Em đã trả lời ${state.practice.speedAnswered.size}/15 câu.`
-    : `Hoàn thành trong ${duration} giây · Kỷ lục Mission ${state.practice.speedMission + 1}: ${state.practice.speedBestScores[missionKey]}/15.`;
-  elements.nextSpeedMissionButton.hidden = state.practice.speedMission === 3;
+    : `Hoàn thành trong ${duration} giây · Kỷ lục của em: ${state.practice.speedBestScores[missionKey]}/15.`;
+  elements.nextSpeedMissionButton.hidden = true;
   recordPractice({
     type: "practice-speed",
-    activityId: `theme1-practice-speed-mission-${state.practice.speedMission + 1}`,
+    activityId: "theme1-practice-speed",
     exercise: "speed",
-    exerciseTitle: `Speed Quiz Mission ${state.practice.speedMission + 1}`,
-    word: `Mission ${state.practice.speedMission + 1} · 15 từ`,
+    exerciseTitle: "Speed Quiz – Thử thách tốc độ",
+    word: "Nhóm từ 46–60 · 15 câu",
     lesson: "Theme 1",
     status: timedOut ? "timed-out" : "completed",
     score: state.practice.speedScore,
@@ -1098,7 +1133,7 @@ function setStudentSession({ uid, known = [], review = [], practice = {} }) {
   state.review = new Set(Array.isArray(review) ? review : []);
   clearInterval(state.practice.speedTimerId);
   state.practice = createPracticeState(practice);
-  const firstMatchingRound = Array.from({ length: 10 }, (_, index) => index + 1).find(round => !state.practice.matchingRounds.has(round));
+  const firstMatchingRound = Array.from({ length: MATCHING_ROUND_COUNT }, (_, index) => index + 1).find(round => !state.practice.matchingRounds.has(round));
   state.practice.matchingRound = firstMatchingRound ? firstMatchingRound - 1 : 0;
   const firstSpelling = state.practice.spellingOrder.findIndex(id => !state.practice.spellingCompleted.has(id));
   state.practice.spellingIndex = firstSpelling >= 0 ? firstSpelling : 0;
@@ -1217,31 +1252,6 @@ function bindEvents() {
     state.practice.matchingSelectedId = Number(card.dataset.matchWord);
     renderMatching();
   });
-  elements.matchingWordBank.addEventListener("dragstart", event => {
-    const card = event.target.closest("[data-match-word]");
-    if (!card) return;
-    const id = card.dataset.matchWord;
-    state.practice.matchingSelectedId = Number(id);
-    event.dataTransfer?.setData("text/plain", id);
-    if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
-    card.classList.add("is-dragging");
-  });
-  elements.matchingWordBank.addEventListener("dragend", event => event.target.closest("[data-match-word]")?.classList.remove("is-dragging"));
-  elements.matchingMeaningBank.addEventListener("dragover", event => {
-    const target = event.target.closest("[data-match-target]");
-    if (!target || target.disabled) return;
-    event.preventDefault();
-    target.classList.add("is-dragover");
-  });
-  elements.matchingMeaningBank.addEventListener("dragleave", event => event.target.closest("[data-match-target]")?.classList.remove("is-dragover"));
-  elements.matchingMeaningBank.addEventListener("drop", event => {
-    const target = event.target.closest("[data-match-target]");
-    if (!target || target.disabled) return;
-    event.preventDefault();
-    target.classList.remove("is-dragover");
-    const wordId = event.dataTransfer?.getData("text/plain") || state.practice.matchingSelectedId;
-    tryMatch(wordId, target.dataset.matchTarget);
-  });
   elements.matchingMeaningBank.addEventListener("click", event => {
     const target = event.target.closest("[data-match-target]");
     if (!target || target.disabled || !state.practice.matchingSelectedId) return;
@@ -1254,9 +1264,9 @@ function bindEvents() {
   elements.previousSpellingButton.addEventListener("click", () => moveSpelling(-1));
   elements.nextSpellingButton.addEventListener("click", () => moveSpelling(1));
   elements.shuffleSpellingButton.addEventListener("click", () => {
-    state.practice.spellingOrder = shuffle(VOCABULARY.map(item => item.id));
+    state.practice.spellingOrder = shuffle(PRACTICE_ITEMS.spelling.map(item => item.id));
     state.practice.spellingIndex = 0;
-    state.practice.spellingFeedback = "Bộ 60 từ đã được xáo trộn. Nhấn nghe để bắt đầu.";
+    state.practice.spellingFeedback = "Nhóm 15 từ đã được xáo trộn. Nhấn nghe để bắt đầu.";
     state.practice.spellingFeedbackType = "";
     renderSpelling();
   });
@@ -1267,13 +1277,13 @@ function bindEvents() {
   });
   elements.nextSituationButton.addEventListener("click", nextSituation);
   elements.shuffleSituationButton.addEventListener("click", () => {
-    state.practice.situationOrder = shuffle(VOCABULARY.map(item => item.id));
+    state.practice.situationOrder = shuffle(PRACTICE_ITEMS.situation.map(item => item.id));
     state.practice.situationIndex = 0;
     state.practice.situationOptions = {};
     state.practice.situationLocked = false;
     state.practice.situationSelectedId = null;
     renderSituation();
-    showToast("Đã xáo trộn 60 tình huống mới 🔀");
+    showToast("Đã xáo trộn 15 tình huống 🔀");
   });
 
   elements.speedMissionCards.forEach(card => card.addEventListener("click", () => selectSpeedMission(card.dataset.speedMission)));
@@ -1287,7 +1297,7 @@ function bindEvents() {
     if (question) speak(question.item.speak, { button: elements.speedAudioButton });
   });
   elements.retrySpeedButton.addEventListener("click", startSpeedQuiz);
-  elements.nextSpeedMissionButton.addEventListener("click", () => selectSpeedMission(Math.min(3, state.practice.speedMission + 1)));
+  elements.nextSpeedMissionButton.addEventListener("click", () => selectSpeedMission(0));
 
   document.addEventListener("keydown", event => {
     if (document.activeElement?.matches("input, select, textarea")) return;
