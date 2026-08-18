@@ -76,7 +76,7 @@ const VOCABULARY = [
 ];
 
 const LESSONS = [...new Map(VOCABULARY.map(item => [item.lesson, item.title])).entries()];
-const STORAGE_KEY = "7oic-vocabulary-progress-v1";
+const STORAGE_KEY_PREFIX = "7oic-vocabulary-progress-v2";
 
 const state = {
   tableOrder: [...VOCABULARY],
@@ -85,6 +85,7 @@ const state = {
   flipped: false,
   known: new Set(),
   review: new Set(),
+  studentUid: null,
   voices: []
 };
 
@@ -388,25 +389,37 @@ function updateProgress() {
 }
 
 function saveProgress() {
+  if (!state.studentUid) return;
+  const progress = {
+    known: [...state.known],
+    review: [...state.review]
+  };
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      known: [...state.known],
-      review: [...state.review]
-    }));
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}:${state.studentUid}`, JSON.stringify(progress));
   } catch {
     // Progress remains available for the current session if storage is blocked.
   }
+  document.dispatchEvent(new CustomEvent("oic:progress-changed", {
+    detail: {
+      ...progress,
+      practiced: progress.known.length + progress.review.length
+    }
+  }));
 }
 
-function loadProgress() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    state.known = new Set(Array.isArray(saved.known) ? saved.known : []);
-    state.review = new Set(Array.isArray(saved.review) ? saved.review : []);
-  } catch {
-    state.known = new Set();
-    state.review = new Set();
-  }
+function setStudentSession({ uid, known = [], review = [] }) {
+  state.studentUid = uid;
+  state.known = new Set(Array.isArray(known) ? known : []);
+  state.review = new Set(Array.isArray(review) ? review : []);
+  updateProgress();
+  renderCard();
+}
+
+function clearStudentSession() {
+  state.studentUid = null;
+  state.known = new Set();
+  state.review = new Set();
+  updateProgress();
 }
 
 function resetProgress() {
@@ -511,10 +524,15 @@ function bindEvents() {
 function init() {
   renderThemeGrid();
   populateLessonSelects();
-  loadProgress();
   renderVocabulary();
   renderCard();
   bindEvents();
+  document.dispatchEvent(new CustomEvent("oic:app-ready"));
 }
+
+window.OICVocabulary = {
+  clearStudentSession,
+  setStudentSession
+};
 
 init();
