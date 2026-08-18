@@ -51,12 +51,12 @@ let pendingProgress = null;
 const pendingActions = new Map();
 
 function initials(name) {
-  return String(name || "HS")
+  return String(name || "ST")
     .trim()
     .split(/\s+/)
     .slice(-2)
     .map(part => part[0]?.toUpperCase() || "")
-    .join("") || "HS";
+    .join("") || "ST";
 }
 
 function setMessage(message = "") {
@@ -71,12 +71,12 @@ function setSyncStatus(status, label) {
 function readableLoginError(error) {
   const code = error?.code || "";
   if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) {
-    return "Tên đăng nhập hoặc mật khẩu chưa đúng.";
+    return "The username or password is incorrect.";
   }
-  if (code.includes("too-many-requests")) return "Có quá nhiều lần thử. Em hãy chờ một lúc rồi đăng nhập lại.";
-  if (code.includes("network-request-failed")) return "Không thể kết nối. Em hãy kiểm tra mạng Internet.";
-  if (code.includes("operation-not-allowed")) return "Hệ thống đăng nhập chưa được giáo viên kích hoạt.";
-  return "Chưa thể đăng nhập. Em hãy kiểm tra lại thông tin giáo viên đã cấp.";
+  if (code.includes("too-many-requests")) return "Too many attempts. Please wait a moment and try again.";
+  if (code.includes("network-request-failed")) return "Unable to connect. Please check your Internet connection.";
+  if (code.includes("operation-not-allowed")) return "Student sign-in has not been enabled yet.";
+  return "Unable to sign in. Please check the account details provided by your teacher.";
 }
 
 function waitForVocabularyApp() {
@@ -103,14 +103,14 @@ async function openStudentLearning(user) {
   const studentRef = doc(db, "students", user.uid);
   const snapshot = await getDoc(studentRef);
   if (!snapshot.exists()) {
-    deferredLoginMessage = "Tài khoản chưa được giáo viên kích hoạt cho trang học.";
+    deferredLoginMessage = "This account has not been activated for the learning page.";
     await signOut(studentAuth);
     return;
   }
 
   const student = { id: snapshot.id, ...snapshot.data() };
   if (!student.accountReady || student.authUid !== user.uid) {
-    deferredLoginMessage = "Tài khoản học sinh chưa hoàn tất. Em hãy liên hệ giáo viên.";
+    deferredLoginMessage = "This student account is incomplete. Please contact your teacher.";
     await signOut(studentAuth);
     return;
   }
@@ -127,8 +127,8 @@ async function openStudentLearning(user) {
 
   elements.accountAvatar.textContent = initials(student.name);
   elements.accountName.textContent = student.name || student.username;
-  elements.accountClass.textContent = `${student.classCode || "Chưa xếp lớp"} · @${student.username}`;
-  setSyncStatus("", "Đã đồng bộ");
+  elements.accountClass.textContent = `${student.classCode || "No class assigned"} · @${student.username}`;
+  setSyncStatus("", "Synced");
   elements.gate.hidden = true;
   elements.learningApp.hidden = false;
   document.body.classList.remove("student-auth-pending");
@@ -137,7 +137,7 @@ async function openStudentLearning(user) {
   updateDoc(studentRef, {
     lastActive: serverTimestamp(),
     updatedAt: serverTimestamp()
-  }).catch(() => setSyncStatus("error", "Chưa đồng bộ"));
+  }).catch(() => setSyncStatus("error", "Not synced"));
 }
 
 async function syncProgress() {
@@ -147,7 +147,7 @@ async function syncProgress() {
   const actions = [...pendingActions.values()];
   pendingProgress = null;
   pendingActions.clear();
-  setSyncStatus("syncing", "Đang lưu...");
+  setSyncStatus("syncing", "Saving...");
   try {
     const studentUid = studentAuth.currentUser.uid;
     const batch = writeBatch(db);
@@ -186,7 +186,7 @@ async function syncProgress() {
       }, { merge: true });
     });
     await batch.commit();
-    setSyncStatus("", "Đã đồng bộ");
+    setSyncStatus("", "Synced");
   } catch {
     pendingProgress = progress;
     actions.forEach(action => {
@@ -197,7 +197,7 @@ async function syncProgress() {
         count: (action.count || 0) + (newer?.count || 0)
       });
     });
-    setSyncStatus("error", "Chưa đồng bộ");
+    setSyncStatus("error", "Not synced");
   }
 }
 
@@ -205,12 +205,12 @@ elements.form.addEventListener("submit", async event => {
   event.preventDefault();
   const username = normalizeStudentUsername(elements.username.value);
   if (username.length < 3) {
-    setMessage("Tên đăng nhập phải có ít nhất 3 ký tự.");
+    setMessage("The username must contain at least 3 characters.");
     return;
   }
   elements.username.value = username;
   elements.loginButton.disabled = true;
-  elements.loginButton.textContent = "⏳ Đang xác thực...";
+  elements.loginButton.textContent = "⏳ Signing in...";
   setMessage();
   try {
     await setPersistence(studentAuth, browserLocalPersistence);
@@ -221,13 +221,13 @@ elements.form.addEventListener("submit", async event => {
     );
     if (credential.user.email?.toLowerCase() === TEACHER_EMAIL.toLowerCase()) {
       await signOut(studentAuth);
-      setMessage("Tài khoản giáo viên vui lòng đăng nhập tại Teacher Dashboard.");
+      setMessage("Teacher accounts must sign in through the Teacher Dashboard.");
     }
   } catch (error) {
     setMessage(readableLoginError(error));
   } finally {
     elements.loginButton.disabled = false;
-    elements.loginButton.textContent = "🚀 Vào trang học của em";
+    elements.loginButton.textContent = "🚀 Enter my learning space";
   }
 });
 
@@ -235,7 +235,7 @@ elements.togglePassword.addEventListener("click", () => {
   const show = elements.password.type === "password";
   elements.password.type = show ? "text" : "password";
   elements.togglePassword.textContent = show ? "🙈" : "👁️";
-  elements.togglePassword.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+  elements.togglePassword.setAttribute("aria-label", show ? "Hide password" : "Show password");
 });
 
 elements.logoutButton.addEventListener("click", async () => {
@@ -267,8 +267,8 @@ onAuthStateChanged(studentAuth, async user => {
     await openStudentLearning(user);
   } catch (error) {
     deferredLoginMessage = error?.code?.includes("permission-denied")
-      ? "Firestore Rules chưa cấp quyền cho tài khoản học sinh. Hãy liên hệ giáo viên."
-      : "Chưa thể mở hồ sơ học tập. Em hãy thử đăng nhập lại.";
+      ? "Firestore Rules do not allow access for this student account. Please contact your teacher."
+      : "Unable to open your learning profile. Please sign in again.";
     await signOut(studentAuth);
   }
 });
