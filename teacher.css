@@ -244,7 +244,7 @@ main { position: relative; z-index: 2; }
 .detail-metric-grid article div { display: flex; flex-direction: column; }
 .detail-metric-grid small { color: var(--muted); font-size: .5rem; font-weight: 950; letter-spacing: .09em; }
 .detail-metric-grid strong { font-size: 1.45rem; line-height: 1.1; }
-.detail-table-card, .student-info-card, .student-progress-summary, .theme-progress-card, .activity-card { overflow: hidden; margin-top: 14px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: var(--shadow-small); }
+.detail-table-card, .student-info-card, .student-progress-summary, .teacher-practice-card, .theme-progress-card, .activity-card { overflow: hidden; margin-top: 14px; border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: var(--shadow-small); }
 .detail-section-heading, .detail-section-heading > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .detail-section-heading { padding: 16px 18px; border-bottom: 1px solid var(--line); }
 .detail-section-heading > div > span { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 13px; background: var(--violet-soft); font-size: 1.2rem; }
@@ -287,11 +287,21 @@ main { position: relative; z-index: 2; }
 .theme-mini-progress { overflow: hidden; height: 7px; margin-top: auto; border-radius: 99px; background: #e9e6f1; }
 .theme-mini-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--cyan),var(--violet)); }
 .student-theme-item p { margin: 6px 0 0; color: var(--muted); font-size: .54rem; font-weight: 750; }
+.teacher-practice-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; padding: 16px; }
+.teacher-practice-item { padding: 13px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(145deg,#fff,#f8f6ff); }
+.teacher-practice-item > div { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 7px; }
+.teacher-practice-item > div span { font-size: 1.2rem; }
+.teacher-practice-item > div strong { font-size: .63rem; }
+.teacher-practice-item > div em { color: var(--violet); font-size: .58rem; font-style: normal; font-weight: 950; }
+.teacher-practice-track { display: block; overflow: hidden; height: 7px; margin-top: 10px; border-radius: 99px; background: #e9e6f1; }
+.teacher-practice-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--cyan),var(--violet)); }
+.teacher-practice-item > small { display: block; margin-top: 5px; color: var(--muted); font-size: .5rem; font-weight: 750; }
 .activity-count-badge { padding: 5px 8px; border-radius: 9px; color: var(--violet); background: var(--violet-soft); font-size: .56rem; font-weight: 950; }
 .activity-table-wrap { overflow: auto; }
 .activity-table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: .65rem; }
 .activity-table th { padding: 11px 12px; color: var(--muted); background: #f7f5fc; font-size: .48rem; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
 .activity-table td { padding: 11px 12px; border-top: 1px solid var(--line); font-weight: 700; }
+.activity-table td > small { display: block; margin-top: 2px; color: var(--muted); font-size: .5rem; }
 .activity-result { display: inline-block; padding: 4px 7px; border-radius: 8px; background: #f1eef7; font-size: .55rem; font-weight: 950; }
 .activity-result--known { color: #287763; background: var(--mint-soft); }
 .activity-result--review { color: #8a6728; background: var(--yellow-soft); }
@@ -358,6 +368,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .dashboard-grid-layout { grid-template-columns: 1fr; }
   .student-detail-layout { grid-template-columns: 1fr; }
   .student-theme-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .teacher-practice-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
 @media (max-width: 860px) {
@@ -415,6 +426,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .danger-button { width: 100%; }
   .progress-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .student-theme-grid { grid-template-columns: 1fr; }
+  .teacher-practice-grid { grid-template-columns: 1fr; }
   .student-info-card dl div { grid-template-columns: 1fr; gap: 2px; }
   .student-info-card dd { text-align: left; }
   .detail-section-heading { align-items: flex-start; }
