@@ -1,5 +1,17 @@
 "use strict";
 
+const THEMES = [
+  { id: 1, title: "What is identity?", icon: "🪪", available: true, words: 60 },
+  { id: 2, title: "Sắp cập nhật", icon: "🌍", available: false },
+  { id: 3, title: "Sắp cập nhật", icon: "🔬", available: false },
+  { id: 4, title: "Sắp cập nhật", icon: "🎨", available: false },
+  { id: 5, title: "Sắp cập nhật", icon: "🌱", available: false },
+  { id: 6, title: "Sắp cập nhật", icon: "🚀", available: false },
+  { id: 7, title: "Sắp cập nhật", icon: "🏛️", available: false },
+  { id: 8, title: "Sắp cập nhật", icon: "💡", available: false },
+  { id: 9, title: "Sắp cập nhật", icon: "🌈", available: false }
+];
+
 const VOCABULARY = [
   { id: 1, lesson: "1", title: "What is identity?", word: "identity", speak: "identity", ipa: "/aɪˈdentəti/", pos: "N", meaning: "Danh tính; những đặc điểm tạo nên một người", example: "Identity is more than a name.", icon: "🪪" },
   { id: 2, lesson: "1", title: "What is identity?", word: "identify", speak: "identify", ipa: "/aɪˈdentɪfaɪ/", pos: "V", meaning: "Nhận dạng; xác định", example: "In what ways can we identify a person?", icon: "🔎" },
@@ -77,6 +89,7 @@ const state = {
 };
 
 const elements = {
+  themeGrid: document.querySelector("#themeGrid"),
   tabs: [...document.querySelectorAll(".tab-button")],
   panels: [...document.querySelectorAll(".tab-panel")],
   searchInput: document.querySelector("#searchInput"),
@@ -113,6 +126,13 @@ const elements = {
   newCount: document.querySelector("#newCount"),
   progressPercent: document.querySelector("#progressPercent"),
   progressRing: document.querySelector("#progressRing"),
+  hubProgressLabel: document.querySelector("#hubProgressLabel"),
+  hubProgressTrack: document.querySelector("#hubProgressTrack"),
+  hubProgressBar: document.querySelector("#hubProgressBar"),
+  hubMasteryLabel: document.querySelector("#hubMasteryLabel"),
+  deckProgressLabel: document.querySelector("#deckProgressLabel"),
+  deckProgressTrack: document.querySelector("#deckProgressTrack"),
+  deckProgressBar: document.querySelector("#deckProgressBar"),
   toast: document.querySelector("#toast"),
   confetti: document.querySelector("#confetti")
 };
@@ -132,6 +152,25 @@ function populateLessonSelects() {
   ).join("");
   elements.lessonFilter.insertAdjacentHTML("beforeend", options);
   elements.deckLessonFilter.insertAdjacentHTML("beforeend", options);
+}
+
+function renderThemeGrid() {
+  elements.themeGrid.innerHTML = THEMES.map(theme => {
+    const stateClass = theme.available ? "theme-card--active" : "theme-card--soon";
+    const details = theme.available ? `${theme.words} từ · IPA · Audio · Flashcards` : "Nội dung đang được chuẩn bị";
+    return `
+      <button class="theme-card ${stateClass}" type="button" data-theme-id="${theme.id}" aria-disabled="${String(!theme.available)}"${theme.available ? ' aria-current="true"' : ""}>
+        <span class="theme-card__number">${theme.id}</span>
+        <span class="theme-card__copy">
+          <small>Theme ${theme.id}</small>
+          <strong>${escapeHtml(theme.title)}</strong>
+          <span>${escapeHtml(details)}</span>
+        </span>
+        <span class="theme-card__icon" aria-hidden="true">${theme.icon}</span>
+        ${theme.available ? '<span class="theme-card__status">ĐÃ MỞ</span>' : ""}
+      </button>
+    `;
+  }).join("");
 }
 
 function getFilteredVocabulary() {
@@ -328,13 +367,24 @@ function updateProgress() {
   const total = VOCABULARY.length;
   const learned = state.known.size;
   const reviewed = state.review.size;
+  const practiced = learned + reviewed;
   const untouched = Math.max(0, total - learned - reviewed);
-  const percent = Math.round((learned / total) * 100);
+  const masteryPercent = Math.round((learned / total) * 100);
+  const practicePercent = Math.round((practiced / total) * 100);
   elements.knownCount.textContent = learned;
   elements.reviewCount.textContent = reviewed;
   elements.newCount.textContent = untouched;
-  elements.progressPercent.textContent = `${percent}%`;
-  elements.progressRing.style.setProperty("--progress", `${percent * 3.6}deg`);
+  elements.progressPercent.textContent = `${masteryPercent}%`;
+  elements.progressRing.style.setProperty("--progress", `${masteryPercent * 3.6}deg`);
+  elements.hubProgressLabel.textContent = `${practiced}/${total} thẻ`;
+  elements.hubProgressBar.style.width = `${practicePercent}%`;
+  elements.hubProgressTrack.setAttribute("aria-valuenow", String(practiced));
+  elements.hubMasteryLabel.textContent = practiced
+    ? `${learned} từ đã nhớ · ${reviewed} từ cần ôn lại`
+    : "0 từ đã nhớ · Bắt đầu ngay nhé!";
+  elements.deckProgressLabel.textContent = `${practiced}/${total}`;
+  elements.deckProgressBar.style.width = `${practicePercent}%`;
+  elements.deckProgressTrack.setAttribute("aria-valuenow", String(practiced));
 }
 
 function saveProgress() {
@@ -390,6 +440,18 @@ function celebrate() {
 }
 
 function bindEvents() {
+  elements.themeGrid.addEventListener("click", event => {
+    const card = event.target.closest("[data-theme-id]");
+    if (!card) return;
+    const theme = THEMES.find(item => item.id === Number(card.dataset.themeId));
+    if (!theme) return;
+    if (!theme.available) {
+      showToast(`Theme ${theme.id} đang được chuẩn bị. Hẹn bạn ở bản cập nhật tiếp theo! ${theme.icon}`);
+      return;
+    }
+    document.querySelector("#theme1").scrollIntoView({ behavior: "smooth", block: "start" });
+    showToast("Theme 1 đã sẵn sàng — chọn Bảng từ vựng hoặc Flashcards nhé! 🚀");
+  });
   elements.tabs.forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
   elements.searchInput.addEventListener("input", renderVocabulary);
   elements.lessonFilter.addEventListener("change", renderVocabulary);
@@ -447,6 +509,7 @@ function bindEvents() {
 }
 
 function init() {
+  renderThemeGrid();
   populateLessonSelects();
   loadProgress();
   renderVocabulary();
