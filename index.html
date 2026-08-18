@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7c5cff">
+  <meta name="description" content="7OIC Vocabulary - Học và luyện 60 từ vựng Oxford Discover Futures 2, Theme 1.">
+  <title>7OIC Vocabulary | What is identity?</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦄%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Bỏ qua đến nội dung chính</a>
+
+  <div class="sky-decor" aria-hidden="true">
+    <span class="cloud cloud-one">☁️</span>
+    <span class="cloud cloud-two">☁️</span>
+    <span class="star star-one">⭐</span>
+    <span class="star star-two">✨</span>
+    <span class="star star-three">🌟</span>
+    <span class="bubble bubble-one"></span>
+    <span class="bubble bubble-two"></span>
+  </div>
+
+  <header class="hero">
+    <div class="hero__mascot mascot-left" aria-hidden="true">
+      <span class="mascot-bubble">Ready?</span>
+      <span class="mascot-emoji">🦊</span>
+    </div>
+
+    <div class="hero__copy">
+      <span class="brand-pill"><span>🌈</span> 7OIC VOCABULARY</span>
+      <p class="eyebrow">Oxford Discover Futures 2 · Theme 1</p>
+      <h1>What is <span>identity?</span></h1>
+      <p class="hero__lead">Khám phá 60 từ vựng bằng âm thanh, IPA và flashcards siêu đáng yêu!</p>
+
+      <div class="hero__stats" aria-label="Thông tin bài học">
+        <div class="stat-chip"><span>🧠</span><strong>60</strong><small>từ vựng</small></div>
+        <div class="stat-chip"><span>🗂️</span><strong>11</strong><small>nhóm bài</small></div>
+        <div class="stat-chip"><span>🔊</span><strong>IPA</strong><small>audio Anh-Anh</small></div>
+      </div>
+    </div>
+
+    <div class="hero__mascot mascot-right" aria-hidden="true">
+      <span class="mascot-emoji">🦄</span>
+      <span class="mascot-bubble">Let's learn!</span>
+    </div>
+  </header>
+
+  <main id="mainContent" class="app-shell">
+    <nav class="tab-bar" aria-label="Chế độ học">
+      <button class="tab-button is-active" type="button" data-tab="learn" aria-selected="true">
+        <span class="tab-icon">📚</span>
+        <span><strong>Bảng từ vựng</strong><small>Học theo bài</small></span>
+      </button>
+      <button class="tab-button" type="button" data-tab="flashcards" aria-selected="false">
+        <span class="tab-icon">🃏</span>
+        <span><strong>Flashcards</strong><small>Lật thẻ luyện tập</small></span>
+      </button>
+    </nav>
+
+    <section id="learnPanel" class="tab-panel is-active" data-panel="learn" aria-labelledby="learnHeading">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">📖 LEARN MODE</span>
+          <h2 id="learnHeading">Bảng từ vựng theo ngữ cảnh</h2>
+          <p>Nhấn nút loa để nghe từ hoặc cả câu ví dụ.</p>
+        </div>
+        <div class="pet-tip" aria-hidden="true"><span>🐣</span> Nghe rồi đọc theo nhé!</div>
+      </div>
+
+      <div class="toolbar" role="search">
+        <label class="control search-control">
+          <span>🔎</span>
+          <span class="sr-only">Tìm từ vựng</span>
+          <input id="searchInput" type="search" placeholder="Tìm từ hoặc nghĩa tiếng Việt..." autocomplete="off">
+        </label>
+
+        <label class="control select-control">
+          <span>🗂️</span>
+          <span class="sr-only">Lọc theo bài học</span>
+          <select id="lessonFilter" aria-label="Lọc theo bài học">
+            <option value="all">Tất cả bài học</option>
+          </select>
+        </label>
+
+        <label class="control select-control speed-control">
+          <span>🎧</span>
+          <span class="sr-only">Tốc độ phát âm</span>
+          <select id="speechRate" aria-label="Tốc độ phát âm">
+            <option value="0.72">Chậm</option>
+            <option value="0.88" selected>Vừa</option>
+            <option value="1">Tự nhiên</option>
+          </select>
+        </label>
+
+        <button id="shuffleTableButton" class="action-button action-button--purple" type="button">
+          <span>🔀</span> Xáo trộn
+        </button>
+        <button id="resetTableButton" class="action-button action-button--ghost" type="button">
+          <span>↩️</span> Thứ tự gốc
+        </button>
+      </div>
+
+      <div class="result-banner" aria-live="polite">
+        <span class="result-banner__icon">🌟</span>
+        <span>Đang hiển thị <strong id="resultCount">60</strong> từ</span>
+        <span class="result-banner__line"></span>
+        <span class="result-banner__hint">Mẹo: bấm <kbd>🔊</kbd> để nghe phát âm</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="vocab-table">
+          <caption class="sr-only">Bảng 60 từ vựng Theme 1 - What is identity?</caption>
+          <thead>
+            <tr>
+              <th scope="col">Lesson</th>
+              <th scope="col">Vocabulary</th>
+              <th scope="col">IPA</th>
+              <th scope="col">Word form</th>
+              <th scope="col">Nghĩa</th>
+              <th scope="col">Ví dụ</th>
+              <th scope="col">Audio</th>
+            </tr>
+          </thead>
+          <tbody id="vocabTableBody"></tbody>
+        </table>
+      </div>
+
+      <div id="vocabMobileList" class="vocab-mobile-list" aria-label="Danh sách từ vựng"></div>
+      <div id="emptyState" class="empty-state" hidden>
+        <span>🔭</span>
+        <h3>Chưa tìm thấy từ phù hợp</h3>
+        <p>Thử đổi từ khóa hoặc chọn “Tất cả bài học” nhé!</p>
+      </div>
+    </section>
+
+    <section id="flashcardsPanel" class="tab-panel" data-panel="flashcards" aria-labelledby="flashcardsHeading" hidden>
+      <div class="section-heading flash-heading">
+        <div>
+          <span class="section-kicker">🃏 PRACTICE MODE</span>
+          <h2 id="flashcardsHeading">Flashcards luyện ghi nhớ</h2>
+          <p>Mặt trước: từ + IPA · Mặt sau: nghĩa. Không hiển thị câu ví dụ.</p>
+        </div>
+        <div class="pet-tip pet-tip--pink" aria-hidden="true"><span>🐼</span> Lật thẻ và tự kiểm tra!</div>
+      </div>
+
+      <div class="flash-toolbar">
+        <label class="control select-control">
+          <span>🗂️</span>
+          <span class="sr-only">Chọn bộ thẻ theo bài học</span>
+          <select id="deckLessonFilter" aria-label="Chọn bộ thẻ theo bài học">
+            <option value="all">Toàn bộ 60 từ</option>
+          </select>
+        </label>
+        <button id="shuffleDeckButton" class="action-button action-button--purple" type="button"><span>🔀</span> Xáo trộn bộ thẻ</button>
+        <button id="resetProgressButton" class="action-button action-button--ghost" type="button"><span>🧹</span> Xóa tiến độ</button>
+      </div>
+
+      <div class="flash-layout">
+        <aside class="progress-card" aria-label="Tiến độ luyện tập">
+          <div class="progress-mascot" aria-hidden="true">🐻</div>
+          <h3>Tiến độ của bạn</h3>
+          <div class="progress-ring" id="progressRing" style="--progress: 0deg">
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-list">
+            <div><span class="dot dot--green"></span><span>Đã nhớ</span><strong id="knownCount">0</strong></div>
+            <div><span class="dot dot--orange"></span><span>Cần ôn</span><strong id="reviewCount">0</strong></div>
+            <div><span class="dot dot--purple"></span><span>Chưa học</span><strong id="newCount">60</strong></div>
+          </div>
+          <p class="keyboard-tip">⌨️ <strong>Phím tắt:</strong> ← → chuyển thẻ · Space lật thẻ · A nghe</p>
+        </aside>
+
+        <div class="deck-stage">
+          <div class="deck-counter" aria-live="polite">
+            <span>Thẻ <strong id="cardPosition">1</strong>/<strong id="deckTotal">60</strong></span>
+            <span id="cardLessonBadge" class="lesson-mini-badge">Lesson 1</span>
+          </div>
+
+          <button id="flashcard" class="flashcard" type="button" aria-label="Lật thẻ" aria-pressed="false">
+            <span class="card-shadow card-shadow--one" aria-hidden="true"></span>
+            <span class="card-shadow card-shadow--two" aria-hidden="true"></span>
+            <span class="flashcard__inner">
+              <span class="flashcard__face flashcard__front">
+                <span class="card-corner">7OIC</span>
+                <span id="cardIcon" class="card-icon" aria-hidden="true">🪪</span>
+                <span class="card-label">VOCABULARY</span>
+                <strong id="cardWord" class="card-word">identity</strong>
+                <span id="cardIpa" class="card-ipa">/aɪˈdentəti/</span>
+                <span id="cardPos" class="pos-badge">N</span>
+                <span class="flip-hint">🔄 Nhấn để xem nghĩa</span>
+              </span>
+              <span class="flashcard__face flashcard__back">
+                <span class="card-corner">MEANING</span>
+                <span id="cardBackIcon" class="card-icon" aria-hidden="true">🪪</span>
+                <span class="card-label">NGHĨA TIẾNG VIỆT</span>
+                <strong id="cardMeaning" class="card-meaning">Danh tính</strong>
+                <span id="cardBackLesson" class="back-lesson">Lesson 1 · What is identity?</span>
+                <span class="flip-hint">🔄 Nhấn để xem lại từ</span>
+              </span>
+            </span>
+          </button>
+
+          <div class="audio-practice-row">
+            <button id="cardAudioButton" class="round-action round-action--audio" type="button"><span>🔊</span><small>Nghe từ</small></button>
+            <button id="cardSlowAudioButton" class="round-action round-action--slow" type="button"><span>🐢</span><small>Nghe chậm</small></button>
+          </div>
+
+          <div class="card-navigation">
+            <button id="previousCardButton" class="nav-arrow" type="button" aria-label="Thẻ trước">←</button>
+            <button id="reviewButton" class="memory-button memory-button--review" type="button"><span>🔁</span> Cần ôn lại</button>
+            <button id="knownButton" class="memory-button memory-button--known" type="button"><span>✅</span> Đã nhớ</button>
+            <button id="nextCardButton" class="nav-arrow" type="button" aria-label="Thẻ tiếp theo">→</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div><span class="footer-logo">🌈 7OIC</span><strong>Learn a little. Grow a lot.</strong></div>
+    <p>Made with 💜 for curious English learners.</p>
+    <div class="footer-icons" aria-hidden="true">⭐ 🧠 🎧 🦄 🚀</div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="confetti" class="confetti-layer" aria-hidden="true"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
