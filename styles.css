@@ -1763,3 +1763,222 @@ select:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Readability pass: a consistent, student-friendly type scale. */
+body {
+  font-size: 17px;
+  line-height: 1.58;
+}
+
+.student-login-badge,
+.student-login-kicker,
+.student-login-form > label,
+.student-login-message,
+.student-login-help,
+.student-account-bar p,
+.student-account-bar p small,
+.student-sync-status,
+.student-account-bar button {
+  font-size: 0.8rem;
+}
+
+.student-login-card > p:not(.student-login-kicker):not(.student-login-message):not(.student-login-help),
+.student-login-field input,
+.student-login-button,
+.student-account-bar p strong {
+  font-size: 0.95rem;
+}
+
+.school-ribbon__mark small,
+.school-ribbon__name span,
+.school-ribbon__teacher small,
+.program-label small,
+.future-hero__eyebrow,
+.future-stats small,
+.science-capsule__status,
+.science-capsule > small,
+.science-data small,
+.future-ticker {
+  font-size: 0.74rem;
+}
+
+.school-ribbon__teacher strong,
+.science-data strong,
+.science-capsule > strong,
+.future-button,
+.future-stats strong {
+  font-size: 0.9rem;
+}
+
+.brand-pill,
+.institution-badge,
+.mascot-bubble,
+.journey-heading p,
+.release-progress__top,
+.theme-study-progress__top,
+.deck-progress-block > div:first-child,
+.theme-card__copy strong,
+.current-theme-banner p,
+.theme-study-progress small,
+.section-heading p,
+.toolbar,
+.flash-toolbar,
+.control,
+.action-button,
+.result-banner,
+.progress-list > div,
+.deck-counter,
+.keyboard-tip,
+.lesson-mini-badge,
+.site-footer,
+.footer-institution span {
+  font-size: 0.88rem;
+}
+
+.stat-chip small,
+.release-progress small,
+.theme-card__copy small,
+.theme-card__copy span,
+.theme-card__status,
+.current-theme-banner__eyebrow,
+.footer-dashboard-link {
+  font-size: 0.8rem;
+}
+
+.tab-button small,
+.lesson-badge small,
+.word-number,
+.card-corner,
+.card-label,
+.back-lesson,
+.flip-hint,
+.round-action small {
+  font-size: 0.8rem;
+}
+
+.vocab-table {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.vocab-table th {
+  font-size: 0.82rem;
+}
+
+.lesson-badge strong,
+.pos-badge,
+.pos-pill {
+  font-size: 0.88rem;
+}
+
+.word-main strong {
+  font-size: 1.05rem;
+}
+
+.mobile-word-head strong {
+  font-size: 1.08rem;
+}
+
+.mobile-word-head .ipa-text,
+.mobile-meta,
+.mobile-example {
+  font-size: 0.85rem;
+}
+
+.mobile-meaning {
+  font-size: 1rem;
+}
+
+.practice-coverage-copy > span,
+.practice-coverage-grid small,
+.practice-mode-button small,
+.practice-task-heading small,
+.matching-board h4,
+.practice-lesson-chip,
+.situation-label,
+.speed-mission-card small,
+.speed-mission-card em,
+.speed-hud small,
+.speed-question-type,
+.speed-result > small {
+  font-size: 0.76rem;
+}
+
+.practice-coverage-copy > small,
+.practice-coverage-grid strong,
+.practice-mode-button strong,
+.practice-task-controls label,
+.practice-task-controls select,
+.practice-task-controls button,
+.practice-utility-button,
+.matching-round-progress,
+.single-question-progress,
+.speed-rules span {
+  font-size: 0.84rem;
+}
+
+.practice-task-heading h3 {
+  font-size: 1.3rem;
+}
+
+.practice-task-heading p {
+  font-size: 0.9rem;
+}
+
+.matching-word strong,
+.matching-meaning strong {
+  font-size: 0.94rem;
+  line-height: 1.4;
+}
+
+.matching-word small,
+.matching-meaning small {
+  font-size: 0.8rem;
+}
+
+.matching-complete-badge,
+.practice-feedback {
+  font-size: 0.88rem;
+}
+
+.spelling-stage > h3 {
+  font-size: 1.25rem;
+}
+
+.spelling-audio-actions button strong,
+.spelling-form button,
+.practice-question-navigation button,
+.practice-next-button,
+.start-speed-button,
+.speed-audio-button,
+.speed-result button {
+  font-size: 0.88rem;
+}
+
+.spelling-audio-actions button small {
+  font-size: 0.78rem;
+}
+
+.spelling-form input {
+  font-size: 1rem;
+}
+
+.situation-card > h3,
+.speed-question-card > h3 {
+  font-size: clamp(1.25rem, 2.4vw, 1.65rem);
+  line-height: 1.4;
+}
+
+.situation-option strong,
+.speed-option strong {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.speed-mission-card strong {
+  font-size: 0.86rem;
+}
+
+.speed-result p {
+  font-size: 0.9rem;
+}
