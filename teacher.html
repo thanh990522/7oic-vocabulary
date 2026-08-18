@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1339">
+  <meta name="description" content="Dashboard quản lý lớp học 7OIC Vocabulary dành cho giáo viên Trường TH-THCS-THPT Việt Anh.">
+  <title>Teacher Dashboard | 7OIC Vocabulary</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧑‍🏫%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="teacher.css">
+</head>
+<body>
+  <div class="dashboard-background" aria-hidden="true">
+    <span class="dashboard-orb dashboard-orb--one"></span>
+    <span class="dashboard-orb dashboard-orb--two"></span>
+    <span class="dashboard-grid"></span>
+  </div>
+
+  <header class="teacher-header">
+    <a class="teacher-brand" href="index.html" aria-label="Trở về trang học từ vựng">
+      <span class="teacher-brand__mark">VA</span>
+      <span><small>TRƯỜNG TH-THCS-THPT VIỆT ANH</small><strong>7OIC Teacher Station</strong></span>
+    </a>
+    <a class="back-to-learning" href="index.html"><span>←</span> Trang học từ vựng</a>
+  </header>
+
+  <main>
+    <section id="authView" class="auth-view" aria-labelledby="loginHeading">
+      <div class="login-illustration" aria-hidden="true">
+        <span class="login-orbit login-orbit--one">⚛️</span>
+        <span class="login-orbit login-orbit--two">🧬</span>
+        <div class="login-robot">🧑‍🚀</div>
+        <span class="login-spark login-spark--one">✦</span>
+        <span class="login-spark login-spark--two">✧</span>
+      </div>
+
+      <div class="login-card">
+        <span class="secure-badge"><i></i> SECURE TEACHER ACCESS</span>
+        <div class="login-card__icon" aria-hidden="true">🔐</div>
+        <p class="login-card__kicker">7OIC CONTROL CENTER</p>
+        <h1 id="loginHeading">Teacher Dashboard</h1>
+        <p>Nhập mật khẩu giáo viên để quản lý lớp học và theo dõi tiến độ từ vựng.</p>
+
+        <form id="teacherLoginForm" class="login-form">
+          <label for="teacherPassword">Mật khẩu giáo viên</label>
+          <div class="password-field">
+            <span aria-hidden="true">🔑</span>
+            <input id="teacherPassword" name="password" type="password" minlength="6" required autocomplete="current-password" placeholder="Nhập mật khẩu">
+            <button id="togglePasswordButton" type="button" aria-label="Hiện mật khẩu">👁️</button>
+          </div>
+          <button id="teacherLoginButton" class="login-button" type="submit"><span>🚀</span> Mở Teacher Dashboard</button>
+        </form>
+        <p id="loginMessage" class="form-message" role="alert" aria-live="polite"></p>
+        <p class="login-note">🛡️ Phiên đăng nhập được Firebase Authentication bảo vệ.</p>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="dashboard-view" hidden>
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-profile">
+          <div class="sidebar-profile__avatar">HC</div>
+          <div><small>TEACHER</small><strong>Mr. Hà Chí Thanh</strong><span>Vocabulary Administrator</span></div>
+        </div>
+
+        <nav class="dashboard-nav" aria-label="Điều hướng dashboard">
+          <button class="dashboard-nav__item is-active" type="button" data-dashboard-panel="overview"><span>🛰️</span><strong>Tổng quan</strong></button>
+          <button class="dashboard-nav__item" type="button" data-dashboard-panel="classes"><span>🏫</span><strong>Lớp học</strong></button>
+          <button class="dashboard-nav__item" type="button" data-dashboard-panel="students"><span>🧑‍🎓</span><strong>Học sinh</strong></button>
+        </nav>
+
+        <div class="sidebar-mission">
+          <span>🚀</span>
+          <small>PROGRAM STATUS</small>
+          <strong>Theme 1 Online</strong>
+          <div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p>1/9 themes đã mở</p>
+        </div>
+      </aside>
+
+      <div class="dashboard-main">
+        <header class="dashboard-topbar">
+          <div>
+            <span class="dashboard-topbar__signal"><i></i> SYSTEM ONLINE</span>
+            <h1 id="dashboardTitle">Tổng quan lớp học</h1>
+          </div>
+          <div class="dashboard-topbar__actions">
+            <span id="teacherSessionName" class="session-chip">👨‍🏫 Mr. Hà Chí Thanh</span>
+            <button id="logoutButton" class="logout-button" type="button"><span>↪</span> Đăng xuất</button>
+          </div>
+        </header>
+
+        <div id="dataNotice" class="data-notice" hidden role="alert"></div>
+
+        <section class="dashboard-panel is-active" data-dashboard-view="overview" aria-labelledby="overviewHeading">
+          <div class="welcome-panel">
+            <div>
+              <span class="panel-kicker">👋 WELCOME BACK, TEACHER</span>
+              <h2 id="overviewHeading">Sẵn sàng cho một hành trình từ vựng mới?</h2>
+              <p>Theo dõi lớp học, tiến độ Theme 1 và chuẩn bị mở khóa 8 themes tiếp theo.</p>
+            </div>
+            <div class="welcome-panel__art" aria-hidden="true">🧑‍🔬<span>🔭</span></div>
+          </div>
+
+          <div class="metric-grid" aria-label="Thống kê lớp học">
+            <article class="metric-card metric-card--cyan"><span>🏫</span><div><small>LỚP HỌC</small><strong id="classCount">0</strong><p>lớp đang quản lý</p></div></article>
+            <article class="metric-card metric-card--violet"><span>🧑‍🎓</span><div><small>HỌC SINH</small><strong id="studentCount">0</strong><p>học sinh trong hệ thống</p></div></article>
+            <article class="metric-card metric-card--mint"><span>⚡</span><div><small>HOẠT ĐỘNG</small><strong id="activeStudentCount">0</strong><p>học trong 7 ngày qua</p></div></article>
+            <article class="metric-card metric-card--yellow"><span>🎯</span><div><small>TIẾN ĐỘ TB.</small><strong id="averageProgress">0%</strong><p>Theme 1 · 60 từ</p></div></article>
+          </div>
+
+          <div class="dashboard-grid-layout">
+            <article class="dashboard-card">
+              <div class="dashboard-card__heading"><div><span>🪐</span><div><small>CLASSROOMS</small><h3>Lớp học của tôi</h3></div></div><button type="button" data-open-dialog="classDialog">+ Tạo lớp</button></div>
+              <div id="overviewClassList" class="class-mini-list"></div>
+              <div id="overviewClassEmpty" class="compact-empty"><span>🛸</span><p>Chưa có lớp học. Hãy tạo lớp đầu tiên!</p></div>
+            </article>
+
+            <article class="dashboard-card">
+              <div class="dashboard-card__heading"><div><span>📡</span><div><small>RECENT ACTIVITY</small><h3>Học sinh gần đây</h3></div></div><button type="button" data-dashboard-link="students">Xem tất cả</button></div>
+              <div class="compact-table-wrap">
+                <table class="compact-table">
+                  <thead><tr><th>Học sinh</th><th>Lớp</th><th>Theme 1</th></tr></thead>
+                  <tbody id="recentStudentTable"></tbody>
+                </table>
+              </div>
+              <div id="recentStudentEmpty" class="compact-empty"><span>🔭</span><p>Chưa có dữ liệu học sinh.</p></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="dashboard-panel" data-dashboard-view="classes" aria-labelledby="classesHeading" hidden>
+          <div class="panel-heading-row">
+            <div><span class="panel-kicker">🏫 CLASS MANAGEMENT</span><h2 id="classesHeading">Quản lý lớp học</h2><p>Tạo mã lớp và sắp xếp học sinh theo từng nhóm.</p></div>
+            <button class="primary-dashboard-button" type="button" data-open-dialog="classDialog"><span>＋</span> Tạo lớp mới</button>
+          </div>
+          <div id="classCardGrid" class="class-card-grid"></div>
+          <div id="classEmptyState" class="dashboard-empty"><span>🪐</span><h3>Chưa có lớp học</h3><p>Tạo lớp đầu tiên để bắt đầu quản lý học sinh.</p><button type="button" data-open-dialog="classDialog">Tạo lớp ngay</button></div>
+        </section>
+
+        <section class="dashboard-panel" data-dashboard-view="students" aria-labelledby="studentsHeading" hidden>
+          <div class="panel-heading-row">
+            <div><span class="panel-kicker">🧑‍🎓 STUDENT PROGRESS</span><h2 id="studentsHeading">Danh sách học sinh</h2><p>Theo dõi tiến độ từ vựng Theme 1 và toàn bộ hành trình 9 themes.</p></div>
+            <button class="primary-dashboard-button" type="button" data-open-dialog="studentDialog"><span>＋</span> Thêm học sinh</button>
+          </div>
+
+          <div class="student-toolbar">
+            <label><span>🔎</span><input id="studentSearchInput" type="search" placeholder="Tìm tên hoặc tài khoản..."></label>
+            <label><span>🏫</span><select id="studentClassFilter"><option value="all">Tất cả lớp</option></select></label>
+          </div>
+
+          <div class="student-table-card">
+            <div class="student-table-wrap">
+              <table class="student-table">
+                <thead><tr><th>Học sinh</th><th>Lớp</th><th>Theme 1</th><th>Đã nhớ</th><th>Cần ôn</th><th>Lần học cuối</th><th>Trạng thái</th></tr></thead>
+                <tbody id="studentTableBody"></tbody>
+              </table>
+            </div>
+            <div id="studentEmptyState" class="dashboard-empty dashboard-empty--inside"><span>🛰️</span><h3>Chưa tìm thấy học sinh</h3><p>Thêm học sinh hoặc thay đổi bộ lọc.</p></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="classDialog" class="dashboard-dialog">
+    <form id="createClassForm" method="dialog">
+      <div class="dialog-heading"><div><span>🏫</span><div><small>NEW CLASSROOM</small><h2>Tạo lớp học mới</h2></div></div><button type="button" data-close-dialog="classDialog" aria-label="Đóng">×</button></div>
+      <label>Tên lớp<input id="classNameInput" name="className" required maxlength="50" placeholder="Ví dụ: 7OIC - Lớp 9A3"></label>
+      <label>Ghi chú<textarea id="classNoteInput" name="note" maxlength="140" placeholder="Thông tin ngắn về lớp học"></textarea></label>
+      <p class="dialog-tip">💡 Mã lớp 6 ký tự sẽ được tạo tự động.</p>
+      <div class="dialog-actions"><button type="button" data-close-dialog="classDialog">Hủy</button><button id="createClassButton" type="submit">🚀 Tạo lớp</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="studentDialog" class="dashboard-dialog">
+    <form id="createStudentForm" method="dialog">
+      <div class="dialog-heading"><div><span>🧑‍🎓</span><div><small>NEW STUDENT</small><h2>Thêm học sinh</h2></div></div><button type="button" data-close-dialog="studentDialog" aria-label="Đóng">×</button></div>
+      <label>Họ và tên<input id="studentNameInput" name="studentName" required maxlength="70" placeholder="Nguyễn Văn An"></label>
+      <label>Tên đăng nhập<input id="studentUsernameInput" name="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9._-]+" placeholder="nguyenvanan"></label>
+      <label>Lớp<select id="studentClassInput" name="classCode" required><option value="">Chọn lớp học</option></select></label>
+      <p class="dialog-tip">🧠 Học sinh mới bắt đầu với tiến độ 0/60 từ ở Theme 1.</p>
+      <div class="dialog-actions"><button type="button" data-close-dialog="studentDialog">Hủy</button><button id="createStudentButton" type="submit">✨ Thêm học sinh</button></div>
+    </form>
+  </dialog>
+
+  <div id="dashboardToast" class="dashboard-toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="teacher.js"></script>
+</body>
+</html>
