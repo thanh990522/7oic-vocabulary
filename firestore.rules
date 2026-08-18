@@ -7,12 +7,32 @@ service cloud.firestore {
         && request.auth.token.email == 'hachithanh2251999@gmail.com';
     }
 
+    function isStudent(studentId) {
+      return request.auth != null
+        && request.auth.uid == studentId;
+    }
+
     match /classes/{classCode} {
       allow read, create, update: if isTeacher();
     }
 
     match /students/{studentId} {
-      allow read, create, update: if isTeacher();
+      allow read: if isTeacher() || isStudent(studentId);
+      allow create: if isTeacher()
+        && request.resource.data.authUid == studentId;
+      allow update: if isTeacher()
+        || (isStudent(studentId)
+          && request.resource.data.authUid == resource.data.authUid
+          && request.resource.data.teacherUid == resource.data.teacherUid
+          && request.resource.data.username == resource.data.username
+          && request.resource.data.classCode == resource.data.classCode
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'themeProgress',
+            'totalKnown',
+            'totalPracticed',
+            'lastActive',
+            'updatedAt'
+          ]));
     }
 
     match /progress/{studentId} {
