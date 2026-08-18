@@ -359,7 +359,14 @@ function markCard(status) {
     state.known.delete(item.id);
     showToast(`Đã thêm “${item.word}” vào danh sách ôn lại 🔁`);
   }
-  saveProgress();
+  saveProgress({
+    type: "flashcard",
+    themeId: 1,
+    wordId: item.id,
+    word: item.word,
+    lesson: item.lesson,
+    status
+  });
   updateProgress();
   moveCard(1);
 }
@@ -388,7 +395,7 @@ function updateProgress() {
   elements.deckProgressTrack.setAttribute("aria-valuenow", String(practiced));
 }
 
-function saveProgress() {
+function saveProgress(action = null) {
   if (!state.studentUid) return;
   const progress = {
     known: [...state.known],
@@ -402,7 +409,8 @@ function saveProgress() {
   document.dispatchEvent(new CustomEvent("oic:progress-changed", {
     detail: {
       ...progress,
-      practiced: progress.known.length + progress.review.length
+      practiced: progress.known.length + progress.review.length,
+      action
     }
   }));
 }
@@ -425,7 +433,7 @@ function clearStudentSession() {
 function resetProgress() {
   state.known.clear();
   state.review.clear();
-  saveProgress();
+  saveProgress({ type: "reset", themeId: 1, status: "reset" });
   updateProgress();
   showToast("Đã xóa tiến độ. Mình bắt đầu lại thật vui nhé! 🌱");
 }
