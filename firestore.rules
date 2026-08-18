@@ -33,6 +33,15 @@ service cloud.firestore {
             'lastActive',
             'updatedAt'
           ]));
+
+      allow delete: if isTeacher();
+
+      match /activity/{activityId} {
+        allow read: if isTeacher() || isStudent(studentId);
+        allow create, update: if isStudent(studentId)
+          && request.resource.data.studentUid == studentId;
+        allow delete: if isTeacher();
+      }
     }
 
     match /progress/{studentId} {
