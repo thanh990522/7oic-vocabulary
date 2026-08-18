@@ -9,8 +9,42 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦄%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="student-auth-pending">
+  <section id="studentAuthGate" class="student-auth-gate" aria-labelledby="studentLoginHeading">
+    <div class="student-login-stars" aria-hidden="true"><span>✦</span><span>🪐</span><span>✧</span><span>🧬</span></div>
+    <div class="student-login-shell">
+      <div class="student-login-art" aria-hidden="true">
+        <span class="student-login-orbit student-login-orbit--one">📚</span>
+        <span class="student-login-orbit student-login-orbit--two">🧠</span>
+        <div class="student-login-astronaut">🧑‍🚀</div>
+        <strong>YOUR WORD<br>MISSION AWAITS!</strong>
+      </div>
+      <div class="student-login-card">
+        <span class="student-login-badge"><i></i> STUDENT LEARNING PORTAL</span>
+        <div class="student-login-icon" aria-hidden="true">🔐</div>
+        <p class="student-login-kicker">7OIC VOCABULARY</p>
+        <h1 id="studentLoginHeading">Đăng nhập để học</h1>
+        <p>Sử dụng tên đăng nhập và mật khẩu do giáo viên cung cấp.</p>
+        <form id="studentLoginForm" class="student-login-form">
+          <label for="studentLoginUsername">Tên đăng nhập</label>
+          <div class="student-login-field"><span aria-hidden="true">🧑‍🎓</span><input id="studentLoginUsername" type="text" required minlength="3" maxlength="24" pattern="[A-Za-z0-9._-]+" autocomplete="username" placeholder="Nhập tên đăng nhập"></div>
+          <label for="studentLoginPassword">Mật khẩu</label>
+          <div class="student-login-field"><span aria-hidden="true">🔑</span><input id="studentLoginPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Nhập mật khẩu"><button id="toggleStudentLoginPassword" type="button" aria-label="Hiện mật khẩu">👁️</button></div>
+          <button id="studentLoginButton" class="student-login-button" type="submit">🚀 Vào trang học của em</button>
+        </form>
+        <p id="studentLoginMessage" class="student-login-message" role="alert" aria-live="polite"></p>
+        <p class="student-login-help">Chưa có tài khoản? Hãy liên hệ giáo viên để được cấp.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="learningApp" hidden>
   <a class="skip-link" href="#mainContent">Bỏ qua đến nội dung chính</a>
+
+  <div class="student-account-bar">
+    <div><span id="studentAccountAvatar">HS</span><p>Xin chào, <strong id="studentAccountName">Học sinh</strong><small id="studentAccountClass">Lớp học từ vựng</small></p></div>
+    <div><span id="studentSyncStatus" class="student-sync-status"><i></i> Đã đồng bộ</span><button id="studentLogoutButton" type="button">↪ Đăng xuất</button></div>
+  </div>
 
   <div class="sky-decor" aria-hidden="true">
     <span class="cloud cloud-one">☁️</span>
@@ -320,7 +354,9 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="confetti" class="confetti-layer" aria-hidden="true"></div>
+  </div>
 
+  <script type="module" src="student-auth.js"></script>
   <script src="app.js" defer></script>
 </body>
 </html>
