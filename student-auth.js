@@ -121,7 +121,8 @@ async function openStudentLearning(user) {
   vocabularyApp.setStudentSession({
     uid: user.uid,
     known: Array.isArray(themeOne.known) ? themeOne.known : [],
-    review: Array.isArray(themeOne.review) ? themeOne.review : []
+    review: Array.isArray(themeOne.review) ? themeOne.review : [],
+    practice: themeOne.practice || {}
   });
 
   elements.accountAvatar.textContent = initials(student.name);
@@ -155,23 +156,31 @@ async function syncProgress() {
       "themeProgress.theme1.review": progress.review,
       "themeProgress.theme1.practiced": progress.practiced,
       "themeProgress.theme1.total": 60,
+      "themeProgress.theme1.practice": progress.practice || {},
       totalKnown: progress.known.length,
       totalPracticed: progress.practiced,
       lastActive: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
     actions.forEach(action => {
-      const activityId = action.type === "flashcard"
+      const activityId = action.activityId || (action.type === "flashcard"
         ? `theme${action.themeId}-word-${action.wordId}`
-        : `theme${action.themeId || 1}-${action.type}`;
+        : `theme${action.themeId || 1}-${action.type}${action.wordId ? `-word-${action.wordId}` : ""}`);
       batch.set(doc(collection(db, "students", studentUid, "activity"), activityId), {
         studentUid,
         type: action.type,
+        exercise: action.exercise || "",
+        exerciseTitle: action.exerciseTitle || "",
         themeId: action.themeId || 1,
         wordId: action.wordId || null,
         word: action.word || "",
         lesson: action.lesson || "",
         status: action.status || "",
+        score: Number.isFinite(Number(action.score)) ? Number(action.score) : null,
+        total: Number.isFinite(Number(action.total)) ? Number(action.total) : null,
+        durationSeconds: Number.isFinite(Number(action.durationSeconds)) ? Number(action.durationSeconds) : null,
+        completed: Number.isFinite(Number(action.completed)) ? Number(action.completed) : null,
+        coverageCount: Number.isFinite(Number(action.coverageCount)) ? Number(action.coverageCount) : 0,
         attemptCount: increment(action.count || 1),
         updatedAt: serverTimestamp()
       }, { merge: true });
@@ -239,9 +248,9 @@ document.addEventListener("oic:progress-changed", event => {
   pendingProgress = event.detail;
   const action = event.detail.action;
   if (action) {
-    const key = action.type === "flashcard"
+    const key = action.activityId || (action.type === "flashcard"
       ? `theme${action.themeId}-word-${action.wordId}`
-      : `theme${action.themeId || 1}-${action.type}`;
+      : `theme${action.themeId || 1}-${action.type}${action.wordId ? `-word-${action.wordId}` : ""}`);
     const existing = pendingActions.get(key);
     pendingActions.set(key, { ...action, key, count: (existing?.count || 0) + 1 });
   }
