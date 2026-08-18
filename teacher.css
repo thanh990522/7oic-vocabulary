@@ -234,6 +234,22 @@ main { position: relative; z-index: 2; }
 .dashboard-dialog input, .dashboard-dialog select, .dashboard-dialog textarea { width: 100%; min-height: 46px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 13px; outline: none; background: #fff; font-size: .75rem; font-weight: 700; resize: vertical; }
 .dashboard-dialog textarea { min-height: 82px; }
 .dashboard-dialog input:focus, .dashboard-dialog select:focus, .dashboard-dialog textarea:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(118,89,233,.09); }
+.student-password-field { display: grid; grid-template-columns: minmax(0,1fr) 42px 42px; gap: 6px; }
+.student-password-field input { min-width: 0; }
+.student-password-field button { min-height: 46px; border: 0; border-radius: 13px; background: var(--violet-soft); cursor: pointer; }
+.credential-dialog { width: min(520px,calc(100% - 28px)); }
+.credential-sheet { padding: 27px; text-align: center; }
+.credential-success { display: grid; width: 72px; height: 72px; margin: 0 auto 13px; place-items: center; border-radius: 23px; background: linear-gradient(145deg,var(--mint-soft),var(--yellow-soft)); font-size: 2.5rem; }
+.credential-kicker { color: var(--mint); font-size: .58rem; font-weight: 1000; letter-spacing: .13em; }
+.credential-sheet h2 { margin: 5px 0 7px; font-size: 1.45rem; }
+.credential-sheet > p { margin: 0 0 18px; color: var(--muted); font-size: .75rem; }
+.credential-box { display: grid; grid-template-columns: 120px minmax(0,1fr); align-items: center; gap: 10px; margin-top: 9px; padding: 13px 15px; border: 2px solid var(--line); border-radius: 15px; background: #faf9fd; text-align: left; }
+.credential-box span { color: var(--muted); font-size: .66rem; font-weight: 850; }
+.credential-box strong { overflow-wrap: anywhere; color: var(--violet); font-size: .9rem; }
+.credential-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; }
+.credential-actions button { min-height: 46px; border: 0; border-radius: 13px; cursor: pointer; font-size: .72rem; font-weight: 900; }
+.credential-actions button:first-child { color: #fff; background: linear-gradient(135deg,var(--violet),#9b78ff); }
+.credential-actions button:last-child { color: var(--ink); background: var(--violet-soft); }
 .dialog-tip { margin: 0; padding: 9px 11px; border-radius: 12px; color: #5f5b78; background: #f7f5fc; font-size: .64rem; font-weight: 750; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 3px; }
 .dialog-actions button { min-height: 42px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; font-size: .68rem; font-weight: 900; }
