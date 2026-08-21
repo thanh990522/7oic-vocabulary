@@ -38,10 +38,12 @@ const db = getFirestore(app);
 const provisioningApp = initializeApp(firebaseConfig, "student-provisioning");
 const provisioningAuth = getAuth(provisioningApp);
 const PRACTICE_ASSIGNMENTS = {
-  matching: [1, 15],
-  spelling: [16, 30],
-  situation: [31, 45],
-  speed: [46, 60]
+  theme1: {
+    matching: [1, 15], spelling: [16, 30], situation: [31, 45], speed: [46, 60]
+  },
+  theme2: {
+    matching: [1, 19], spelling: [20, 38], situation: [39, 56], speed: [57, 71]
+  }
 };
 
 const state = {
@@ -151,7 +153,7 @@ const PANEL_TITLES = {
 
 const THEME_NAMES = [
   "What is identity?",
-  "How do we discover?",
+  "Language & Communication",
   "What makes us healthy?",
   "How do people create change?",
   "Why do we tell stories?",
@@ -189,12 +191,19 @@ function practiceRangeCount(value, [start, end]) {
   return new Set(value.map(Number).filter(id => Number.isInteger(id) && id >= start && id <= end)).size;
 }
 
-function themeOneProgress(student) {
-  const theme = student.themeProgress?.theme1 || {};
-  const known = valueCount(theme.known);
-  const review = valueCount(theme.review);
-  const practiced = Number(theme.practiced) || known + review;
-  const total = Number(theme.total) || 60;
+function combinedProgress(student) {
+  const releasedThemes = [
+    { data: student.themeProgress?.theme1 || {}, fallbackTotal: 60 },
+    { data: student.themeProgress?.theme2 || {}, fallbackTotal: 71 }
+  ];
+  const known = releasedThemes.reduce((sum, item) => sum + valueCount(item.data.known), 0);
+  const review = releasedThemes.reduce((sum, item) => sum + valueCount(item.data.review), 0);
+  const practiced = releasedThemes.reduce((sum, item) => {
+    const themeKnown = valueCount(item.data.known);
+    const themeReview = valueCount(item.data.review);
+    return sum + (Number(item.data.practiced) || themeKnown + themeReview);
+  }, 0);
+  const total = releasedThemes.reduce((sum, item) => sum + (Number(item.data.total) || item.fallbackTotal), 0);
   const percent = Math.min(100, Math.round((practiced / total) * 100));
   return { known, review, practiced, total, percent };
 }
@@ -338,7 +347,7 @@ function studentById(studentId) {
 function renderMetrics() {
   const activeStudents = state.students.filter(isRecentlyActive).length;
   const average = state.students.length
-    ? Math.round(state.students.reduce((sum, student) => sum + themeOneProgress(student).percent, 0) / state.students.length)
+    ? Math.round(state.students.reduce((sum, student) => sum + combinedProgress(student).percent, 0) / state.students.length)
     : 0;
   elements.classCount.textContent = state.classes.length;
   elements.studentCount.textContent = state.students.length;
@@ -366,7 +375,7 @@ function renderRecentStudents() {
   elements.recentStudentEmpty.hidden = items.length > 0;
   elements.recentStudentTable.parentElement.parentElement.hidden = items.length === 0;
   elements.recentStudentTable.innerHTML = items.map(student => {
-    const progress = themeOneProgress(student);
+    const progress = combinedProgress(student);
     return `
       <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="overview">
         <td><div class="mini-person"><span class="mini-avatar">${escapeHtml(initials(student.name))}</span><strong>${escapeHtml(student.name)}</strong></div></td>
@@ -385,7 +394,7 @@ function renderClassCards() {
       <div class="class-card__top"><span class="class-card__icon">${["🚀", "🪐", "🔬", "🧬"][index % 4]}</span><span class="class-code">${escapeHtml(item.id)}</span></div>
       <h3>${escapeHtml(item.name)}</h3>
       <p>${escapeHtml(item.note || "Lớp học từ vựng Oxford Discover Futures 2.")}</p>
-      <div class="class-card__bottom"><span>🧑‍🎓 ${classStudentCount(item.id)} học sinh</span><strong>1/9 THEMES</strong></div>
+      <div class="class-card__bottom"><span>🧑‍🎓 ${classStudentCount(item.id)} học sinh</span><strong>2/9 THEMES</strong></div>
       <span class="class-card__open">Xem lớp →</span>
     </button>
   `).join("");
@@ -416,7 +425,7 @@ function renderStudentTable() {
   elements.studentEmptyState.hidden = students.length > 0;
   elements.studentTableBody.parentElement.parentElement.hidden = students.length === 0;
   elements.studentTableBody.innerHTML = students.map(student => {
-    const progress = themeOneProgress(student);
+    const progress = combinedProgress(student);
     const active = isRecentlyActive(student);
     return `
       <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="students">
@@ -439,7 +448,7 @@ function renderClassDetail() {
   const students = state.students.filter(student => student.classCode === classroom.id);
   const activeCount = students.filter(isRecentlyActive).length;
   const average = students.length
-    ? Math.round(students.reduce((sum, student) => sum + themeOneProgress(student).percent, 0) / students.length)
+    ? Math.round(students.reduce((sum, student) => sum + combinedProgress(student).percent, 0) / students.length)
     : 0;
 
   elements.classDetailName.textContent = classroom.name || "Lớp học";
@@ -451,7 +460,7 @@ function renderClassDetail() {
   elements.classDetailEmpty.hidden = students.length > 0;
   elements.classDetailStudentTable.parentElement.parentElement.hidden = students.length === 0;
   elements.classDetailStudentTable.innerHTML = students.map(student => {
-    const progress = themeOneProgress(student);
+    const progress = combinedProgress(student);
     return `
       <tr data-student-detail="${escapeHtml(student.id)}" data-detail-back="class-detail">
         <td><div class="student-identity"><span class="student-avatar">${escapeHtml(initials(student.name))}</span><div><strong>${escapeHtml(student.name)}</strong><small>@${escapeHtml(student.username || "chưa-có")}</small></div></div></td>
@@ -507,7 +516,7 @@ function renderStudentActivity() {
         <td>${escapeHtml(formatDate(item.updatedAt))}</td>
         <td><strong>${escapeHtml(activityLabels[item.type] || item.exerciseTitle || "Luyện tập")}</strong>${duration}</td>
         <td><strong>${escapeHtml(item.word || "—")}</strong></td>
-        <td>${escapeHtml(item.lesson || `Theme ${item.themeId || 1}`)}</td>
+        <td>${escapeHtml(item.lesson ? `Theme ${item.themeId || 1} · Lesson ${item.lesson}` : `Theme ${item.themeId || 1}`)}</td>
         <td><span class="activity-result ${resultClass}">${escapeHtml(result)}</span></td>
         <td>${Math.max(1, Number(item.attemptCount) || 1)}</td>
       </tr>
@@ -537,7 +546,7 @@ function renderStudentDetail() {
   if (!student) return;
   const classroom = classByCode(student.classCode);
   const classLabel = classroom ? `${classroom.name} · ${classroom.id}` : (student.classCode || "Chưa xếp lớp");
-  const progress = themeOneProgress(student);
+  const progress = combinedProgress(student);
   const active = isRecentlyActive(student);
 
   elements.studentDetailAvatar.textContent = initials(student.name);
@@ -559,19 +568,26 @@ function renderStudentDetail() {
   elements.studentDetailProgressBar.style.width = `${progress.percent}%`;
   elements.studentDetailProgressLabel.textContent = `${progress.percent}% hoàn thành`;
 
-  const practice = student.themeProgress?.theme1?.practice || {};
   const practiceItems = [
-    ["🧩", "Matching · từ 01–15", practiceRangeCount(practice.matching?.completedWords, PRACTICE_ASSIGNMENTS.matching)],
-    ["🎧", "Nghe & viết · từ 16–30", practiceRangeCount(practice.spelling?.completedWords, PRACTICE_ASSIGNMENTS.spelling)],
-    ["💬", "Ngữ cảnh · từ 31–45", practiceRangeCount(practice.situation?.completedWords, PRACTICE_ASSIGNMENTS.situation)],
-    ["⚡", "Speed Quiz · từ 46–60", practiceRangeCount(practice.speed?.completedWords, PRACTICE_ASSIGNMENTS.speed)]
-  ];
-  elements.studentPracticeGrid.innerHTML = practiceItems.map(([icon, label, completed]) => {
-    const safeCompleted = Math.min(15, Number(completed) || 0);
-    const percent = Math.round((safeCompleted / 15) * 100);
+    { theme: 1, key: "matching", icon: "🧩", label: "Matching · từ 01–15", total: 15 },
+    { theme: 1, key: "spelling", icon: "🎧", label: "Nghe & viết · từ 16–30", total: 15 },
+    { theme: 1, key: "situation", icon: "💬", label: "Ngữ cảnh · từ 31–45", total: 15 },
+    { theme: 1, key: "speed", icon: "⚡", label: "Speed Quiz · từ 46–60", total: 15 },
+    { theme: 2, key: "matching", icon: "🧩", label: "Matching · từ 01–19", total: 19 },
+    { theme: 2, key: "spelling", icon: "🎧", label: "Nghe & viết · từ 20–38", total: 19 },
+    { theme: 2, key: "situation", icon: "💬", label: "Ngữ cảnh · từ 39–56", total: 18 },
+    { theme: 2, key: "speed", icon: "⚡", label: "Speed Quiz · từ 57–71", total: 15 }
+  ].map(item => {
+    const practice = student.themeProgress?.[`theme${item.theme}`]?.practice || {};
+    const range = PRACTICE_ASSIGNMENTS[`theme${item.theme}`][item.key];
+    return { ...item, completed: practiceRangeCount(practice[item.key]?.completedWords, range) };
+  });
+  elements.studentPracticeGrid.innerHTML = practiceItems.map(({ theme, icon, label, completed, total }) => {
+    const safeCompleted = Math.min(total, Number(completed) || 0);
+    const percent = Math.round((safeCompleted / total) * 100);
     return `
       <div class="teacher-practice-item">
-        <div><span>${icon}</span><strong>${escapeHtml(label)}</strong><em>${safeCompleted}/15</em></div>
+        <div><span>${icon}</span><strong>Theme ${theme} · ${escapeHtml(label)}</strong><em>${safeCompleted}/${total}</em></div>
         <span class="teacher-practice-track"><i style="width:${percent}%"></i></span>
         <small>${percent}% từ đã thực hành</small>
       </div>
@@ -581,13 +597,14 @@ function renderStudentDetail() {
   elements.studentThemeGrid.innerHTML = THEME_NAMES.map((name, index) => {
     const number = index + 1;
     const raw = student.themeProgress?.[`theme${number}`] || {};
-    const total = Number(raw.total) || (number === 1 ? 60 : 0);
+    const fallbackTotals = { 1: 60, 2: 71 };
+    const total = Number(raw.total) || fallbackTotals[number] || 0;
     const practiced = Number(raw.practiced) || valueCount(raw.known) + valueCount(raw.review);
     const percent = total ? Math.min(100, Math.round((practiced / total) * 100)) : 0;
-    const open = number === 1 || total > 0;
+    const open = number <= 2 || total > 0;
     return `
       <div class="student-theme-item${open ? " is-open" : " is-locked"}">
-        <div><span>${open ? ["🧬", "🔭", "🫀", "🌱", "📖", "🤖", "🐚", "🏙️", "🚀"][index] : "🔒"}</span><small>THEME ${number}</small></div>
+        <div><span>${open ? ["🪪", "🌍", "🫀", "🌱", "📖", "🤖", "🐚", "🏙️", "🚀"][index] : "🔒"}</span><small>THEME ${number}</small></div>
         <strong>${escapeHtml(name)}</strong>
         <span class="theme-mini-progress"><i style="width:${percent}%"></i></span>
         <p>${open ? `${practiced}/${total} từ · ${percent}%` : "Sắp mở khóa"}</p>
@@ -617,16 +634,19 @@ function renderDashboard() {
 }
 
 function createThemeProgress() {
+  const releasedTotals = { 0: 60, 1: 71 };
   const progress = Object.fromEntries(Array.from({ length: 9 }, (_, index) => [
     `theme${index + 1}`,
-    { known: [], review: [], practiced: 0, total: index === 0 ? 60 : 0 }
+    { known: [], review: [], practiced: 0, total: releasedTotals[index] || 0 }
   ]));
-  progress.theme1.practice = {
-    matching: { completedWords: [], roundsCompleted: [] },
-    spelling: { completedWords: [], correctWords: [] },
-    situation: { completedWords: [], correctWords: [] },
-    speed: { completedWords: [], bestScores: {} }
-  };
+  ["theme1", "theme2"].forEach(themeKey => {
+    progress[themeKey].practice = {
+      matching: { completedWords: [], roundsCompleted: [] },
+      spelling: { completedWords: [], correctWords: [] },
+      situation: { completedWords: [], correctWords: [] },
+      speed: { completedWords: [], bestScores: {} }
+    };
+  });
   return progress;
 }
 
@@ -683,7 +703,7 @@ async function handleCreateClass(event) {
       teacherUid: teacher.uid,
       teacherEmail: TEACHER_EMAIL,
       themeCount: 9,
-      releasedThemes: 1,
+      releasedThemes: 2,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });

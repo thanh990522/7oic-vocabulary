@@ -117,12 +117,12 @@ async function openStudentLearning(user) {
 
   activeStudent = student;
   const vocabularyApp = await waitForVocabularyApp();
-  const themeOne = student.themeProgress?.theme1 || {};
+  const themeTwo = student.themeProgress?.theme2 || {};
   vocabularyApp.setStudentSession({
     uid: user.uid,
-    known: Array.isArray(themeOne.known) ? themeOne.known : [],
-    review: Array.isArray(themeOne.review) ? themeOne.review : [],
-    practice: themeOne.practice || {}
+    known: Array.isArray(themeTwo.known) ? themeTwo.known : [],
+    review: Array.isArray(themeTwo.review) ? themeTwo.review : [],
+    practice: themeTwo.practice || {}
   });
 
   elements.accountAvatar.textContent = initials(student.name);
@@ -152,17 +152,16 @@ async function syncProgress() {
     const studentUid = studentAuth.currentUser.uid;
     const batch = writeBatch(db);
     batch.update(doc(db, "students", studentUid), {
-      "themeProgress.theme1.known": progress.known,
-      "themeProgress.theme1.review": progress.review,
-      "themeProgress.theme1.practiced": progress.practiced,
-      "themeProgress.theme1.total": 60,
-      "themeProgress.theme1.practice": progress.practice || {},
-      totalKnown: progress.known.length
-        + (Array.isArray(activeStudent.themeProgress?.theme2?.known) ? activeStudent.themeProgress.theme2.known.length : 0),
-      totalPracticed: progress.practiced
-        + (Number(activeStudent.themeProgress?.theme2?.practiced)
-          || (Array.isArray(activeStudent.themeProgress?.theme2?.known) ? activeStudent.themeProgress.theme2.known.length : 0)
-            + (Array.isArray(activeStudent.themeProgress?.theme2?.review) ? activeStudent.themeProgress.theme2.review.length : 0)),
+      "themeProgress.theme2.known": progress.known,
+      "themeProgress.theme2.review": progress.review,
+      "themeProgress.theme2.practiced": progress.practiced,
+      "themeProgress.theme2.total": 71,
+      "themeProgress.theme2.practice": progress.practice || {},
+      totalKnown: (Array.isArray(activeStudent.themeProgress?.theme1?.known) ? activeStudent.themeProgress.theme1.known.length : 0) + progress.known.length,
+      totalPracticed: (Number(activeStudent.themeProgress?.theme1?.practiced)
+        || (Array.isArray(activeStudent.themeProgress?.theme1?.known) ? activeStudent.themeProgress.theme1.known.length : 0)
+          + (Array.isArray(activeStudent.themeProgress?.theme1?.review) ? activeStudent.themeProgress.theme1.review.length : 0))
+        + progress.practiced,
       lastActive: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
@@ -276,3 +275,4 @@ onAuthStateChanged(studentAuth, async user => {
     await signOut(studentAuth);
   }
 });
+

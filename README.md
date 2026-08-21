@@ -1,6 +1,6 @@
 # 7OIC Vocabulary
 
-Vocabulary Hub dành cho toàn bộ **9 themes của Oxford Discover Futures 2**. Nội dung được mở dần theo từng theme; hiện tại **Theme 1: What is identity?** đã sẵn sàng với 60 từ.
+Vocabulary Hub dành cho toàn bộ **9 themes của Oxford Discover Futures 2**. Nội dung được mở dần theo từng theme; hiện tại **Theme 1: What is identity?** (60 từ) và **Theme 2: Language & Communication** (71 từ) đã sẵn sàng.
 
 ## Tính năng
 
@@ -10,15 +10,15 @@ Vocabulary Hub dành cho toàn bộ **9 themes của Oxford Discover Futures 2**
 - Flashcards hai mặt không hiển thị câu ví dụ.
 - Xáo trộn bộ thẻ, lọc theo lesson, đánh dấu “Đã nhớ” / “Cần ôn”.
 - Thanh tiến độ flashcards hiển thị số thẻ đã luyện và tỷ lệ ghi nhớ.
-- Practice Lab chia 60 từ thành 4 nhóm không trùng nhau: Matching (từ 01–15), nghe–viết (16–30), ngữ cảnh (31–45) và Speed Quiz (46–60).
-- Bài Matching dùng thao tác chọn từ rồi chọn nghĩa, gồm 3 bộ × 5 từ; Speed Quiz gồm 15 câu trong 90 giây. Hoàn thành cả 4 dạng sẽ cover đủ 60 từ.
+- Mỗi theme có Practice Lab chia toàn bộ từ thành 4 nhóm không trùng nhau. Theme 2 gồm Matching (01–19), nghe–viết (20–38), ngữ cảnh (39–56) và Speed Quiz (57–71).
+- Bài Matching dùng thao tác chọn từ rồi chọn nghĩa theo từng bộ tối đa 5 từ; Speed Quiz gồm 15 câu trong 90 giây. Hoàn thành cả 4 dạng sẽ cover đủ toàn bộ từ của theme.
 - Tiến độ từng dạng bài, điểm số, thời gian và số lần làm được đồng bộ vào hồ sơ học sinh.
 - Lưu tiến độ trên thiết bị bằng `localStorage`.
-- Teacher Dashboard đăng nhập bằng mật khẩu Firebase, quản lý lớp và theo dõi tiến độ Theme 1.
+- Teacher Dashboard đăng nhập bằng mật khẩu Firebase, quản lý lớp và theo dõi tiến độ tổng hợp Themes 1–2.
 - Giáo viên tạo username và mật khẩu riêng cho từng học sinh ngay trong dashboard.
 - Có thể mở từng lớp để xem toàn bộ thành viên, số học sinh hoạt động và tiến độ trung bình.
 - Hồ sơ từng học sinh hiển thị thông tin tài khoản, tiến độ đủ 9 themes và lịch sử luyện flashcards.
-- Dashboard giáo viên hiển thị tiến độ 15 từ được phân công cho từng dạng Practice Lab và lịch sử kết quả bài tập.
+- Dashboard giáo viên hiển thị riêng tiến độ từng nhóm Practice Lab của Themes 1–2 và lịch sử kết quả bài tập.
 - Giáo viên có thể xóa hồ sơ, tiến độ và lịch sử của học sinh bằng hộp xác nhận an toàn.
 - Trang học yêu cầu đăng nhập bắt buộc; không có chức năng học sinh tự đăng ký.
 - Tiến độ flashcards đồng bộ theo tài khoản học sinh trên Firestore và hiển thị theo thời gian thực cho giáo viên.
@@ -46,7 +46,7 @@ Không lưu mật khẩu trong repository. Dashboard gửi mật khẩu trực t
 
 ## Thêm theme mới
 
-Metadata của 9 themes nằm trong mảng `THEMES`, còn dữ liệu từ vựng đang nằm trong `VOCABULARY` của `app.js`. Các theme chưa có nội dung được hiển thị ở trạng thái “Sắp cập nhật”, giúp bổ sung dần mà không phải thay đổi cấu trúc giao diện chính.
+Theme 1 dùng `index.html` và `app.js`; Theme 2 dùng `theme2.html`, `theme2-data.js`, `theme2-app.js` và `theme2-auth.js`. Các theme chưa có nội dung tiếp tục hiển thị ở trạng thái “Coming soon”.
 
 ## Chạy cục bộ
 

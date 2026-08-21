@@ -12,147 +12,27 @@ const THEMES = [
   { id: 9, title: "Coming soon", icon: "🌈", available: false }
 ];
 
-const VOCABULARY = [
-  { id: 1, lesson: "1", title: "What is identity?", word: "identity", speak: "identity", ipa: "/aɪˈdentəti/", pos: "N", meaning: "Danh tính; những đặc điểm tạo nên một người", example: "Identity is more than a name.", icon: "🪪" },
-  { id: 2, lesson: "1", title: "What is identity?", word: "identify", speak: "identify", ipa: "/aɪˈdentɪfaɪ/", pos: "V", meaning: "Nhận dạng; xác định", example: "In what ways can we identify a person?", icon: "🔎" },
-  { id: 3, lesson: "1", title: "What is identity?", word: "characteristic", speak: "characteristic", ipa: "/ˌkærəktəˈrɪstɪk/", pos: "N", meaning: "Đặc điểm; đặc trưng", example: "Why is it useful to use physical characteristics to identify people?", icon: "🧩" },
-  { id: 4, lesson: "1", title: "What is identity?", word: "astronaut", speak: "astronaut", ipa: "/ˈæstrənɔːt/", pos: "N", meaning: "Phi hành gia", example: "Ellen Ochoa was one of NASA's first female astronauts.", icon: "👩‍🚀" },
-  { id: 5, lesson: "1", title: "What is identity?", word: "gender", speak: "gender", ipa: "/ˈdʒendə/", pos: "N", meaning: "Giới tính", example: "How can gender make it difficult to achieve a goal?", icon: "⚧️" },
-  { id: 6, lesson: "1", title: "What is identity?", word: "well-dressed", speak: "well dressed", ipa: "/ˌwel ˈdrest/", pos: "Adj", meaning: "Ăn mặc đẹp; ăn mặc lịch sự", example: "Moziah Bridges is a well-dressed fashion designer who has created a successful business.", icon: "👔" },
-  { id: 7, lesson: "1", title: "What is identity?", word: "determined", speak: "determined", ipa: "/dɪˈtɜːmɪnd/", pos: "Adj", meaning: "Quyết tâm; kiên định", example: "Robin Emmons is a kind and determined middle-aged woman.", icon: "🎯" },
-  { id: 8, lesson: "1", title: "What is identity?", word: "enthusiastic", speak: "enthusiastic", ipa: "/ɪnˌθjuːziˈæstɪk/", pos: "Adj", meaning: "Nhiệt tình; đầy nhiệt huyết", example: "The elderly and enthusiastic runner Fauja Singh completed marathons even after his 100th birthday.", icon: "🤩" },
-  { id: 9, lesson: "1", title: "What is identity?", word: "blond-haired", speak: "blond haired", ipa: "/ˌblɒnd ˈheəd/", pos: "Adj", meaning: "Có mái tóc vàng", example: "Blond-haired, blue-eyed Mick Fanning is a courageous surfer who once survived a shark attack.", icon: "👱" },
-  { id: 10, lesson: "1", title: "What is identity?", word: "blue-eyed", speak: "blue eyed", ipa: "/ˌbluː ˈaɪd/", pos: "Adj", meaning: "Có đôi mắt xanh", example: "Blond-haired, blue-eyed Mick Fanning is a courageous surfer who once survived a shark attack.", icon: "👁️" },
-  { id: 11, lesson: "1", title: "What is identity?", word: "elderly", speak: "elderly", ipa: "/ˈeldəli/", pos: "Adj", meaning: "Cao tuổi; lớn tuổi", example: "The elderly and enthusiastic runner Fauja Singh completed marathons even after his 100th birthday.", icon: "👵" },
-  { id: 12, lesson: "1", title: "What is identity?", word: "ethnic group", speak: "ethnic group", ipa: "/ˌeθnɪk ˈɡruːp/", pos: "NP", meaning: "Nhóm dân tộc", example: "A person's ethnic group can form part of their identity.", icon: "🌍" },
-  { id: 13, lesson: "2", title: "What makes you unique?", word: "passion", speak: "passion", ipa: "/ˈpæʃn/", pos: "N", meaning: "Niềm đam mê", example: "My real passion is basketball.", icon: "🏀" },
-  { id: 14, lesson: "2", title: "What makes you unique?", word: "recipe", speak: "recipe", ipa: "/ˈresəpi/", pos: "N", meaning: "Công thức nấu ăn", example: "Maybe they like my Indian recipes!", icon: "🍲" },
-  { id: 15, lesson: "2", title: "What makes you unique?", word: "inspiration", speak: "inspiration", ipa: "/ˌɪnspəˈreɪʃn/", pos: "N", meaning: "Nguồn cảm hứng", example: "Gandhi, who we're studying in school, is really an inspiration for me.", icon: "💡" },
-  { id: 16, lesson: "3", title: "Same but different", word: "divide into", speak: "divide into", ipa: "/dɪˈvaɪd ˈɪntuː/", pos: "VP", meaning: "Chia thành", example: "Why is it divided into two parts?", icon: "🧱" },
-  { id: 17, lesson: "3", title: "Same but different", word: "gist", speak: "gist", ipa: "/dʒɪst/", pos: "N", meaning: "Ý chính; nội dung khái quát", example: "When we read for the general idea or gist, we don't focus on every individual word.", icon: "🎯" },
-  { id: 18, lesson: "3", title: "Same but different", word: "biometric technology", speak: "biometric technology", ipa: "/ˌbaɪəʊˈmetrɪk tekˈnɒlədʒi/", pos: "NP", meaning: "Công nghệ sinh trắc học", example: "How does biometric technology work?", icon: "🖐️" },
-  { id: 19, lesson: "3", title: "Same but different", word: "unique", speak: "unique", ipa: "/juˈniːk/", pos: "Adj", meaning: "Độc nhất; riêng biệt", example: "Physically, we are all unique in many ways.", icon: "🦄" },
-  { id: 20, lesson: "3", title: "Same but different", word: "similarity", speak: "similarity", ipa: "/ˌsɪməˈlærəti/", pos: "N", meaning: "Sự tương đồng; điểm giống nhau", example: "Their similarities weren't only physical.", icon: "🧬" },
-  { id: 21, lesson: "3", title: "Same but different", word: "measure / measurement", speak: "measure, measurement", ipa: "/ˈmeʒə/ · /ˈmeʒəmənt/", pos: "V / N", meaning: "Đo lường / phép đo; số đo", example: "Scanners use measurements, data, and algorithms to recognize our unique features.", icon: "📏" },
-  { id: 22, lesson: "3", title: "Same but different", word: "identical", speak: "identical", ipa: "/aɪˈdentɪkl/", pos: "Adj", meaning: "Giống hệt nhau", example: "Even identical-looking people have unique fingerprints.", icon: "👯" },
-  { id: 23, lesson: "4", title: "What makes us who we are?", word: "optimistic", speak: "optimistic", ipa: "/ˌɒptɪˈmɪstɪk/", pos: "Adj", meaning: "Lạc quan", example: "Maybe that's why I'm an optimistic person.", icon: "🌞" },
-  { id: 24, lesson: "4", title: "What makes us who we are?", word: "pacifist", speak: "pacifist", ipa: "/ˈpæsɪfɪst/", pos: "N", meaning: "Người theo chủ nghĩa hòa bình", example: "He needed a lot of courage to be a pacifist.", icon: "🕊️" },
-  { id: 25, lesson: "4", title: "What makes us who we are?", word: "courage", speak: "courage", ipa: "/ˈkʌrɪdʒ/", pos: "N", meaning: "Lòng dũng cảm", example: "He needed a lot of courage to be a pacifist.", icon: "🦁" },
-  { id: 26, lesson: "4", title: "What makes us who we are?", word: "courageous", speak: "courageous", ipa: "/kəˈreɪdʒəs/", pos: "Adj", meaning: "Dũng cảm", example: "Mick Fanning is a courageous surfer who once survived a shark attack.", icon: "🦸" },
-  { id: 27, lesson: "5", title: "Who am I?", word: "hectic", speak: "hectic", ipa: "/ˈhektɪk/", pos: "Adj", meaning: "Bận rộn; hối hả", example: "Asha's life can be hectic because she has music, cooking, basketball, and school.", icon: "🏃" },
-  { id: 28, lesson: "5", title: "Who am I?", word: "rewarding", speak: "rewarding", ipa: "/rɪˈwɔːdɪŋ/", pos: "Adj", meaning: "Bổ ích; đem lại cảm giác thỏa mãn", example: "Learning a new instrument can be challenging but rewarding.", icon: "🏆" },
-  { id: 29, lesson: "6", title: "Why do we need to protect our identity?", word: "digital resilience", speak: "digital resilience", ipa: "/ˌdɪdʒɪtl rɪˈzɪliəns/", pos: "NP", meaning: "Khả năng thích ứng và phục hồi trong môi trường số", example: "Digital resilience helps people respond safely to online risks.", icon: "🛡️" },
-  { id: 30, lesson: "6", title: "Why do we need to protect our identity?", word: "fraud", speak: "fraud", ipa: "/frɔːd/", pos: "N", meaning: "Hành vi gian lận; lừa đảo", example: "Criminals can use a person's identity to commit fraud.", icon: "🚨" },
-  { id: 31, lesson: "6", title: "Why do we need to protect our identity?", word: "identity theft", speak: "identity theft", ipa: "/aɪˈdentəti θeft/", pos: "NP", meaning: "Hành vi đánh cắp danh tính", example: "Some young people become victims of identity theft, when criminals use a person's identity to get money or a credit card.", icon: "🕵️" },
-  { id: 32, lesson: "6", title: "Why do we need to protect our identity?", word: "phishing", speak: "phishing", ipa: "/ˈfɪʃɪŋ/", pos: "N", meaning: "Lừa đảo trực tuyến nhằm đánh cắp dữ liệu", example: "Phishing is when we receive emails which ask us to send private information or trick us to click on links.", icon: "🎣" },
-  { id: 33, lesson: "6", title: "Why do we need to protect our identity?", word: "scam", speak: "scam", ipa: "/skæm/", pos: "N / V", meaning: "Trò lừa đảo; lừa đảo", example: "A phishing email may be part of an online scam.", icon: "⚠️" },
-  { id: 34, lesson: "6", title: "Why do we need to protect our identity?", word: "shoulder surfer", speak: "shoulder surfer", ipa: "/ˈʃəʊldə ˌsɜːfə/", pos: "NP", meaning: "Kẻ nhìn trộm màn hình để lấy thông tin", example: "Shoulder surfers try to look at screens to get a PIN, password, and other data.", icon: "👀" },
-  { id: 35, lesson: "7", title: "What is identity theft?", word: "identity alert", speak: "identity alert", ipa: "/aɪˈdentəti əˈlɜːt/", pos: "NP", meaning: "Cảnh báo về nguy cơ đánh cắp danh tính", example: "The Identity Alert page explains the risks of sharing personal information online.", icon: "🚨" },
-  { id: 36, lesson: "7", title: "What is identity theft?", word: "privacy", speak: "privacy", ipa: "/ˈprɪvəsi/", pos: "N", meaning: "Quyền riêng tư; sự riêng tư", example: "Many teens worry about the privacy of their personal information.", icon: "🔐" },
-  { id: 37, lesson: "7", title: "What is identity theft?", word: "private", speak: "private", ipa: "/ˈpraɪvət/", pos: "Adj", meaning: "Riêng tư; cá nhân", example: "Phishing emails may ask us to send private information.", icon: "🙈" },
-  { id: 38, lesson: "7", title: "What is identity theft?", word: "PIN (Personal Identification Number)", speak: "PIN, Personal Identification Number", ipa: "/pɪn/", pos: "NP", meaning: "Mã số định danh cá nhân; mã PIN", example: "Shoulder surfers try to get a PIN, password, and other data.", icon: "🔢" },
-  { id: 39, lesson: "7", title: "What is identity theft?", word: "avoid", speak: "avoid", ipa: "/əˈvɔɪd/", pos: "V", meaning: "Tránh", example: "Prepare a talk with advice about identity theft and how to avoid it.", icon: "🚧" },
-  { id: 40, lesson: "7", title: "What is identity theft?", word: "hotspot", speak: "hotspot", ipa: "/ˈhɒtspɒt/", pos: "N", meaning: "Điểm phát / truy cập Wi-Fi", example: "Most of us use public Wi-Fi hotspots, but many of them are open and unsecured.", icon: "📶" },
-  { id: 41, lesson: "7", title: "What is identity theft?", word: "spyware", speak: "spyware", ipa: "/ˈspaɪweə/", pos: "N", meaning: "Phần mềm gián điệp", example: "Some links can install viruses or spyware.", icon: "🐛" },
-  { id: 42, lesson: "7", title: "What is identity theft?", word: "consequence", speak: "consequence", ipa: "/ˈkɒnsɪkwəns/", pos: "N", meaning: "Hậu quả", example: "A serious consequence of identity theft is losing money or access to an account.", icon: "🔄" },
-  { id: 43, lesson: "8", title: "Protecting our identity online", word: "repetition", speak: "repetition", ipa: "/ˌrepəˈtɪʃn/", pos: "N", meaning: "Sự lặp lại", example: "Repetition means saying something important several times in different ways.", icon: "🔁" },
-  { id: 44, lesson: "8", title: "Protecting our identity online", word: "emphasize", speak: "emphasize", ipa: "/ˈemfəsaɪz/", pos: "V", meaning: "Nhấn mạnh", example: "We can emphasize a point or argument in various ways.", icon: "📣" },
-  { id: 45, lesson: "10", title: "How to avoid identity theft", word: "cyber security", speak: "cyber security", ipa: "/ˌsaɪbə sɪˈkjʊərəti/", pos: "NP", meaning: "An ninh mạng", example: "Good cyber security protects your devices and personal information.", icon: "🛡️" },
-  { id: 46, lesson: "10", title: "How to avoid identity theft", word: "install", speak: "install", ipa: "/ɪnˈstɔːl/", pos: "V", meaning: "Cài đặt", example: "Some links can install viruses or spyware.", icon: "💾" },
-  { id: 47, lesson: "11", title: "A descriptive profile", word: "appearance", speak: "appearance", ipa: "/əˈpɪərəns/", pos: "N", meaning: "Ngoại hình", example: "A descriptive profile can include appearance, clothes, family, interests, and personality.", icon: "🪞" },
-  { id: 48, lesson: "11", title: "A descriptive profile", word: "stand out", speak: "stand out", ipa: "/ˌstænd ˈaʊt/", pos: "VP", meaning: "Nổi bật", example: "He doesn't like to stand out, but you can't miss him because of his height.", icon: "🌟" },
-  { id: 49, lesson: "11", title: "A descriptive profile", word: "eccentric", speak: "eccentric", ipa: "/ɪkˈsentrɪk/", pos: "Adj", meaning: "Lập dị; khác thường", example: "His brightly colored hats make me think he's a little eccentric.", icon: "🎩" },
-  { id: 50, lesson: "11", title: "A descriptive profile", word: "show off", speak: "show off", ipa: "/ˌʃəʊ ˈɒf/", pos: "VP", meaning: "Khoe khoang", example: "He's modest and he doesn't show off.", icon: "💃" },
-  { id: 51, lesson: "11", title: "A descriptive profile", word: "gossip", speak: "gossip", ipa: "/ˈɡɒsɪp/", pos: "V", meaning: "Buôn chuyện; lan truyền tin đồn", example: "He never gossips online and people respect that, I think.", icon: "🗣️" },
-  { id: 52, lesson: "11", title: "A descriptive profile", word: "aspect", speak: "aspect", ipa: "/ˈæspekt/", pos: "N", meaning: "Khía cạnh", example: "Describe the aspects of their identity that you can see and those you can't.", icon: "🔍" },
-  { id: 53, lesson: "11", title: "A descriptive profile", word: "modify", speak: "modify", ipa: "/ˈmɒdɪfaɪ/", pos: "V", meaning: "Chỉnh sửa; điều chỉnh", example: "So you think it's OK to modify pictures for social media?", icon: "✏️" },
-  { id: 54, lesson: "14–15", title: "Someone I look up to", word: "code breaking", speak: "code breaking", ipa: "/ˈkəʊd ˌbreɪkɪŋ/", pos: "NP", meaning: "Việc giải mã; phá mã", example: "Code breaking was an important part of Alan Turing's work.", icon: "🧠" },
-  { id: 55, lesson: "14–15", title: "Someone I look up to", word: "dishonest", speak: "dishonest", ipa: "/dɪsˈɒnɪst/", pos: "Adj", meaning: "Không trung thực", example: "It is dishonest to claim that another person's work is your own.", icon: "🤥" },
-  { id: 56, lesson: "14–15", title: "Someone I look up to", word: "participate in", speak: "participate in", ipa: "/pɑːˈtɪsɪpeɪt ɪn/", pos: "VP", meaning: "Tham gia vào", example: "An estimated 15.5 million young people participate in volunteer activities.", icon: "🙋" },
-  { id: 57, lesson: "14–15", title: "Someone I look up to", word: "reputation", speak: "reputation", ipa: "/ˌrepjuˈteɪʃn/", pos: "N", meaning: "Danh tiếng", example: "His achievements earned him a reputation as a brilliant mathematician.", icon: "🌟" },
-  { id: 58, lesson: "14–15", title: "Someone I look up to", word: "look up to", speak: "look up to", ipa: "/ˌlʊk ˈʌp tuː/", pos: "VP", meaning: "Kính trọng; ngưỡng mộ", example: "Many people look up to Alan Turing because of his intelligence and courage.", icon: "🙌" },
-  { id: 59, lesson: "14–15", title: "Someone I look up to", word: "look down on", speak: "look down on", ipa: "/ˌlʊk ˈdaʊn ɒn/", pos: "VP", meaning: "Coi thường", example: "We should never look down on people because they are different.", icon: "👎" },
-  { id: 60, lesson: "14–15", title: "Someone I look up to", word: "admire", speak: "admire", ipa: "/ədˈmaɪə/", pos: "V", meaning: "Ngưỡng mộ; khâm phục", example: "Search online for information about a person you admire.", icon: "💖" }
-];
+const VOCABULARY = window.THEME_2_DATA.vocabulary;
 
 const PRACTICE_MODES = ["matching", "spelling", "situation", "speed"];
-const PRACTICE_GROUP_SIZE = Math.ceil(VOCABULARY.length / PRACTICE_MODES.length);
+const PRACTICE_GROUP_SIZES = [19, 19, 18, 15];
 const MATCHING_ROUND_SIZE = 5;
-const PRACTICE_ITEMS = Object.fromEntries(PRACTICE_MODES.map((mode, index) => [
-  mode,
-  VOCABULARY.slice(index * PRACTICE_GROUP_SIZE, (index + 1) * PRACTICE_GROUP_SIZE)
-]));
+let practiceOffset = 0;
+const PRACTICE_ITEMS = Object.fromEntries(PRACTICE_MODES.map((mode, index) => {
+  const items = VOCABULARY.slice(practiceOffset, practiceOffset + PRACTICE_GROUP_SIZES[index]);
+  practiceOffset += PRACTICE_GROUP_SIZES[index];
+  return [mode, items];
+}));
 const PRACTICE_ID_SETS = Object.fromEntries(PRACTICE_MODES.map(mode => [
   mode,
   new Set(PRACTICE_ITEMS[mode].map(item => item.id))
 ]));
 const MATCHING_ROUND_COUNT = Math.ceil(PRACTICE_ITEMS.matching.length / MATCHING_ROUND_SIZE);
 
-const SITUATIONS = [
-  "A username, face, values, and background can all form part of a person's ____.",
-  "The police used a clear photograph to ____ the missing traveller.",
-  "Patience is an important ____ of a good team leader.",
-  "After years of space training, Linh hopes to work as an ____.",
-  "The survey asks for age, nationality, and ____.",
-  "Nam wore a clean suit and polished shoes, so he looked very ____.",
-  "Mai failed twice, but she remained ____ and kept practising.",
-  "The volunteers were so ____ that they arrived early and cheered everyone.",
-  "In the portrait, the ____ child is wearing a red cap.",
-  "The artist painted a ____ hero with dark hair.",
-  "The community centre runs gentle exercise classes for ____ residents.",
-  "Their shared language and traditions connect them as an ____.",
-  "Photography is not just a hobby; it is her greatest ____.",
-  "I followed a new ____ to make vegetable soup.",
-  "My science teacher became my ____ and encouraged me to study engineering.",
-  "Please ____ the class ____ four teams for the experiment.",
-  "Read the headline and first paragraph to understand the ____.",
-  "The airport scans faces using ____.",
-  "No two snowflakes are exactly the same; each one is ____.",
-  "A love of music is one ____ between the two friends.",
-  "The nurse used a tape to ____ my height and wrote the ____ down.",
-  "The twins wore ____ jackets, so I could not tell them apart.",
-  "Even after a difficult day, Minh stays ____ and expects tomorrow to be better.",
-  "A ____ refuses to support war and promotes peaceful solutions.",
-  "It takes ____ to speak up when someone is being bullied.",
-  "The ____ firefighter entered the building to help a family.",
-  "My schedule was so ____ that I had no free time between school and practice.",
-  "Teaching younger children can be tiring but very ____.",
-  "After an online problem, ____ helps you recover, learn, and stay safe.",
-  "The bank investigated a case of ____ involving false payments.",
-  "Someone used Hoa's personal details to open an account; this is ____.",
-  "A fake email asked me to enter my password on a suspicious page; it was ____.",
-  "The offer promised a free phone but asked for money first—it was a ____.",
-  "At the ATM, a ____ stood behind me trying to see my PIN.",
-  "The banking app sent an ____ after an unusual login.",
-  "Use strong settings to protect your online ____.",
-  "Never post ____ information such as your home address.",
-  "Cover the keypad when entering your ____.",
-  "To ____ malware, do not download files from unknown senders.",
-  "We connected our tablets to the library's Wi-Fi ____.",
-  "The app secretly watched everything I typed; it contained ____.",
-  "Losing access to your account can be a serious ____ of weak security.",
-  "The coach used ____ by saying the key message several times.",
-  "Use a stronger voice to ____ the most important warning.",
-  "Strong passwords and software updates are part of good ____.",
-  "Please ____ the security update before using the laptop.",
-  "Hair, height, and clothing are parts of a person's ____.",
-  "Her bright silver boots made her ____ in the crowd.",
-  "The inventor was known for ____ habits, such as working only at midnight.",
-  "Duy always talks loudly about his prizes because he likes to ____.",
-  "It is unkind to ____ about classmates behind their backs.",
-  "Confidence is one ____ of identity that cannot be seen in a photograph.",
-  "Use the editor to ____ the brightness of the picture.",
-  "The team used logic and patterns for ____ during the competition.",
-  "Copying a classmate's project and calling it your own is ____.",
-  "Every student can ____ the school clean-up day.",
-  "Years of reliable work gave the doctor an excellent ____.",
-  "I ____ my older sister because she works hard and helps others.",
-  "We should not ____ someone because of their clothes or accent.",
-  "I really ____ the scientist for using her knowledge to help communities."
-];
+const SITUATIONS = window.THEME_2_DATA.situations;
 
 const LESSONS = [...new Map(VOCABULARY.map(item => [item.lesson, item.title])).entries()];
-const STORAGE_KEY_PREFIX = "7oic-vocabulary-progress-v2";
+const STORAGE_KEY_PREFIX = "7oic-vocabulary-progress-theme2-v2";
 
 const state = {
   tableOrder: [...VOCABULARY],
@@ -295,7 +175,7 @@ function renderThemeGrid() {
     const stateClass = theme.available ? "theme-card--active" : "theme-card--soon";
     const details = theme.available ? `${theme.words} words · IPA · Audio · Flashcards · Practice Lab` : "Content is being prepared";
     return `
-      <button class="theme-card ${stateClass}" type="button" data-theme-id="${theme.id}" aria-disabled="${String(!theme.available)}"${theme.id === 1 ? ' aria-current="true"' : ""}>
+      <button class="theme-card ${stateClass}" type="button" data-theme-id="${theme.id}" aria-disabled="${String(!theme.available)}"${theme.id === 2 ? ' aria-current="true"' : ""}>
         <span class="theme-card__number">${theme.id}</span>
         <span class="theme-card__copy">
           <small>Theme ${theme.id}</small>
@@ -462,7 +342,7 @@ function practiceProgressPayload() {
 function recordPractice(action) {
   updatePracticeProgress();
   saveProgress({
-    themeId: 1,
+    themeId: 2,
     coverageCount: 0,
     ...action
   });
@@ -493,7 +373,7 @@ function updatePracticeProgress() {
   elements.speedMissionScores.forEach((element, index) => {
     if (!element) return;
     const score = state.practice.speedBestScores[`mission${index + 1}`];
-    element.textContent = Number.isFinite(Number(score)) ? `Best ${score}/15` : "Not attempted";
+    element.textContent = Number.isFinite(Number(score)) ? `Best ${score}/${PRACTICE_ITEMS.speed.length}` : "Not attempted";
   });
 }
 
@@ -569,11 +449,11 @@ function tryMatch(wordId, targetId) {
     state.practice.matchingRounds.add(state.practice.matchingRound + 1);
     recordPractice({
       type: "practice-matching",
-      activityId: `theme1-practice-matching-round-${state.practice.matchingRound + 1}`,
+      activityId: `theme2-practice-matching-round-${state.practice.matchingRound + 1}`,
       exercise: "matching",
       exerciseTitle: "Match words with meanings",
       word: `Set ${state.practice.matchingRound + 1}: words ${items[0].id}–${items.at(-1).id}`,
-      lesson: "Theme 1",
+      lesson: "Theme 2",
       status: "completed",
       score: items.length,
       total: items.length,
@@ -604,15 +484,14 @@ function normalizeAnswer(value) {
 
 function acceptedSpellings(item) {
   const answers = [item.word, item.speak];
-  if (item.id === 21) answers.push("measure measurement", "measure", "measurement");
-  if (item.id === 38) answers.push("PIN", "Personal Identification Number", "PIN Personal Identification Number");
+  if (item.id === 38) answers.push("concentrate", "concentration", "concentrate concentration");
+  if (item.id === 45) answers.push("participate", "participation", "participate participation");
+  if (item.id === 59) answers.push("pros and cons");
   return new Set(answers.map(normalizeAnswer));
 }
 
 function spellOutText(item) {
-  const source = item.id === 38
-    ? "PIN"
-    : item.word.replace(/\([^)]*\)/g, "").replaceAll("/", " ").trim();
+  const source = item.word.replace(/\([^)]*\)/g, "").replaceAll("/", " ").trim();
   return [...source.toLocaleLowerCase("en")]
     .map(character => {
       if (/[a-z0-9]/.test(character)) return character;
@@ -660,7 +539,7 @@ function checkSpelling(event) {
     : "Not quite. You can replay the audio as many times as you need, then try again.";
   recordPractice({
     type: "practice-spelling",
-    activityId: `theme1-practice-spelling-word-${item.id}`,
+    activityId: `theme2-practice-spelling-word-${item.id}`,
     exercise: "spelling",
     exerciseTitle: "Listen and spell",
     wordId: item.id,
@@ -740,7 +619,7 @@ function answerSituation(answerId) {
     : `The correct answer is “${item.word}” — ${item.meaning}.`;
   recordPractice({
     type: "practice-situation",
-    activityId: `theme1-practice-situation-word-${item.id}`,
+    activityId: `theme2-practice-situation-word-${item.id}`,
     exercise: "situation",
     exerciseTitle: "Choose the word for the situation",
     wordId: item.id,
@@ -856,9 +735,9 @@ function renderSpeedQuestion() {
   const question = currentSpeedQuestion();
   if (!question) return;
   elements.speedTimer.textContent = state.practice.speedTimeLeft;
-  elements.speedQuestionCount.textContent = `${state.practice.speedIndex + 1}/15`;
+  elements.speedQuestionCount.textContent = `${state.practice.speedIndex + 1}/${PRACTICE_ITEMS.speed.length}`;
   elements.speedLiveScore.textContent = state.practice.speedScore;
-  elements.speedProgressBar.style.width = `${Math.round((state.practice.speedIndex / 15) * 100)}%`;
+  elements.speedProgressBar.style.width = `${Math.round((state.practice.speedIndex / PRACTICE_ITEMS.speed.length) * 100)}%`;
   elements.speedQuestionType.textContent = question.type;
   elements.speedPrompt.textContent = question.prompt;
   elements.speedAudioButton.hidden = !question.audio;
@@ -909,22 +788,22 @@ function finishSpeedQuiz(timedOut) {
   const duration = Math.min(90, Math.max(1, Math.round((Date.now() - state.practice.speedStartedAt) / 1000)));
   elements.speedGame.hidden = true;
   elements.speedResult.hidden = false;
-  elements.speedResultScore.textContent = `${state.practice.speedScore}/15`;
+  elements.speedResultScore.textContent = `${state.practice.speedScore}/${PRACTICE_ITEMS.speed.length}`;
   elements.speedResultTitle.textContent = state.practice.speedScore >= 13 ? "Lightning fast!" : state.practice.speedScore >= 9 ? "Great job!" : "Keep practising!";
   elements.speedResultMessage.textContent = timedOut
-    ? `Time's up after 90 seconds · You answered ${state.practice.speedAnswered.size}/15 questions.`
-    : `Completed in ${duration} seconds · Your best score: ${state.practice.speedBestScores[missionKey]}/15.`;
+    ? `Time's up after 90 seconds · You answered ${state.practice.speedAnswered.size}/${PRACTICE_ITEMS.speed.length} questions.`
+    : `Completed in ${duration} seconds · Your best score: ${state.practice.speedBestScores[missionKey]}/${PRACTICE_ITEMS.speed.length}.`;
   elements.nextSpeedMissionButton.hidden = true;
   recordPractice({
     type: "practice-speed",
-    activityId: "theme1-practice-speed",
+    activityId: "theme2-practice-speed",
     exercise: "speed",
     exerciseTitle: "Speed Quiz",
-    word: "Words 46–60 · 15 questions",
-    lesson: "Theme 1",
+    word: "Words 57–71 · 15 questions",
+    lesson: "Theme 2",
     status: timedOut ? "timed-out" : "completed",
     score: state.practice.speedScore,
-    total: 15,
+    total: PRACTICE_ITEMS.speed.length,
     durationSeconds: duration,
     completed: state.practice.speedAnswered.size,
     coverageCount: state.practice.speedCompleted.size
@@ -1072,7 +951,7 @@ function markCard(status) {
   }
   saveProgress({
     type: "flashcard",
-    themeId: 1,
+    themeId: 2,
     wordId: item.id,
     word: item.word,
     lesson: item.lesson,
@@ -1157,7 +1036,7 @@ function clearStudentSession() {
 function resetProgress() {
   state.known.clear();
   state.review.clear();
-  saveProgress({ type: "reset", themeId: 1, status: "reset" });
+  saveProgress({ type: "reset", themeId: 2, status: "reset" });
   updateProgress();
   showToast("Progress cleared. Let's enjoy a fresh start! 🌱");
 }
@@ -1194,12 +1073,12 @@ function bindEvents() {
       showToast(`Theme ${theme.id} is being prepared. See you in the next update! ${theme.icon}`);
       return;
     }
-    if (theme.id === 2) {
-      window.location.href = "theme2.html";
+    if (theme.id === 1) {
+      window.location.href = "index.html";
       return;
     }
-    document.querySelector("#theme1").scrollIntoView({ behavior: "smooth", block: "start" });
-    showToast("Theme 1 is ready — choose Vocabulary, Flashcards, or Practice Lab! 🚀");
+    document.querySelector("#theme2").scrollIntoView({ behavior: "smooth", block: "start" });
+    showToast("Theme 2 is ready — choose Vocabulary, Flashcards, or Practice Lab! 🚀");
   });
   elements.tabs.forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
   elements.searchInput.addEventListener("input", renderVocabulary);
@@ -1270,7 +1149,7 @@ function bindEvents() {
   elements.shuffleSpellingButton.addEventListener("click", () => {
     state.practice.spellingOrder = shuffle(PRACTICE_ITEMS.spelling.map(item => item.id));
     state.practice.spellingIndex = 0;
-    state.practice.spellingFeedback = "The 15 words have been shuffled. Press the audio button to begin.";
+    state.practice.spellingFeedback = "The 19 words have been shuffled. Press the audio button to begin.";
     state.practice.spellingFeedbackType = "";
     renderSpelling();
   });
@@ -1287,7 +1166,7 @@ function bindEvents() {
     state.practice.situationLocked = false;
     state.practice.situationSelectedId = null;
     renderSituation();
-    showToast("The 15 situations have been shuffled 🔀");
+    showToast("The 18 situations have been shuffled 🔀");
   });
 
   elements.speedMissionCards.forEach(card => card.addEventListener("click", () => selectSpeedMission(card.dataset.speedMission)));
