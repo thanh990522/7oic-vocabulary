@@ -152,7 +152,7 @@ const SITUATIONS = [
 ];
 
 const LESSONS = [...new Map(VOCABULARY.map(item => [item.lesson, item.title])).entries()];
-const STORAGE_KEY_PREFIX = "7oic-vocabulary-progress-v2";
+const PUBLIC_STORAGE_KEY = "7oic-vocabulary-public-theme1-v1";
 
 const state = {
   tableOrder: [...VOCABULARY],
@@ -161,7 +161,6 @@ const state = {
   flipped: false,
   known: new Set(),
   review: new Set(),
-  studentUid: null,
   voices: [],
   practice: createPracticeState()
 };
@@ -1106,52 +1105,37 @@ function updateProgress() {
   elements.deckProgressTrack.setAttribute("aria-valuenow", String(practiced));
 }
 
-function saveProgress(action = null) {
-  if (!state.studentUid) return;
+function saveProgress() {
   const progress = {
     known: [...state.known],
     review: [...state.review],
     practice: practiceProgressPayload()
   };
   try {
-    localStorage.setItem(`${STORAGE_KEY_PREFIX}:${state.studentUid}`, JSON.stringify(progress));
+    localStorage.setItem(PUBLIC_STORAGE_KEY, JSON.stringify(progress));
   } catch {
     // Progress remains available for the current session if storage is blocked.
   }
-  document.dispatchEvent(new CustomEvent("oic:progress-changed", {
-    detail: {
-      ...progress,
-      practiced: progress.known.length + progress.review.length,
-      action
-    }
-  }));
 }
 
-function setStudentSession({ uid, known = [], review = [], practice = {} }) {
-  state.studentUid = uid;
-  state.known = new Set(Array.isArray(known) ? known : []);
-  state.review = new Set(Array.isArray(review) ? review : []);
-  clearInterval(state.practice.speedTimerId);
-  state.practice = createPracticeState(practice);
+function loadPublicProgress() {
+  let saved = {};
+  try {
+    const stored = JSON.parse(localStorage.getItem(PUBLIC_STORAGE_KEY) || "{}");
+    if (stored && typeof stored === "object" && !Array.isArray(stored)) saved = stored;
+  } catch {
+    // Start a fresh session if stored data is invalid or storage is blocked.
+  }
+  const validIds = new Set(VOCABULARY.map(item => item.id));
+  state.known = new Set((Array.isArray(saved.known) ? saved.known : []).filter(id => validIds.has(id)));
+  state.review = new Set((Array.isArray(saved.review) ? saved.review : []).filter(id => validIds.has(id) && !state.known.has(id)));
+  state.practice = createPracticeState(saved.practice && typeof saved.practice === "object" && !Array.isArray(saved.practice) ? saved.practice : {});
   const firstMatchingRound = Array.from({ length: MATCHING_ROUND_COUNT }, (_, index) => index + 1).find(round => !state.practice.matchingRounds.has(round));
   state.practice.matchingRound = firstMatchingRound ? firstMatchingRound - 1 : 0;
   const firstSpelling = state.practice.spellingOrder.findIndex(id => !state.practice.spellingCompleted.has(id));
   state.practice.spellingIndex = firstSpelling >= 0 ? firstSpelling : 0;
   const firstSituation = state.practice.situationOrder.findIndex(id => !state.practice.situationCompleted.has(id));
   state.practice.situationIndex = firstSituation >= 0 ? firstSituation : 0;
-  updateProgress();
-  renderCard();
-  initializePractice();
-}
-
-function clearStudentSession() {
-  clearInterval(state.practice.speedTimerId);
-  state.studentUid = null;
-  state.known = new Set();
-  state.review = new Set();
-  state.practice = createPracticeState();
-  updateProgress();
-  initializePractice();
 }
 
 function resetProgress() {
@@ -1323,18 +1307,13 @@ function bindEvents() {
 }
 
 function init() {
+  loadPublicProgress();
   renderThemeGrid();
   populateLessonSelects();
   renderVocabulary();
   renderCard();
   initializePractice();
   bindEvents();
-  document.dispatchEvent(new CustomEvent("oic:app-ready"));
 }
-
-window.OICVocabulary = {
-  clearStudentSession,
-  setStudentSession
-};
 
 init();

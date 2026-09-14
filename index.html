@@ -9,41 +9,12 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦄%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="student-auth-pending">
-  <section id="studentAuthGate" class="student-auth-gate" aria-labelledby="studentLoginHeading">
-    <div class="student-login-stars" aria-hidden="true"><span>✦</span><span>🪐</span><span>✧</span><span>🧬</span></div>
-    <div class="student-login-shell">
-      <div class="student-login-art" aria-hidden="true">
-        <span class="student-login-orbit student-login-orbit--one">📚</span>
-        <span class="student-login-orbit student-login-orbit--two">🧠</span>
-        <div class="student-login-astronaut">🧑‍🚀</div>
-        <strong>YOUR WORD<br>MISSION AWAITS!</strong>
-      </div>
-      <div class="student-login-card">
-        <span class="student-login-badge"><i></i> STUDENT LEARNING PORTAL</span>
-        <div class="student-login-icon" aria-hidden="true">🔐</div>
-        <p class="student-login-kicker">7OIC VOCABULARY</p>
-        <h1 id="studentLoginHeading">Log in to learn</h1>
-        <p>Use the username and password provided by your teacher.</p>
-        <form id="studentLoginForm" class="student-login-form">
-          <label for="studentLoginUsername">Username</label>
-          <div class="student-login-field"><span aria-hidden="true">🧑‍🎓</span><input id="studentLoginUsername" type="text" required minlength="3" maxlength="24" pattern="[A-Za-z0-9._-]+" autocomplete="username" placeholder="Enter your username"></div>
-          <label for="studentLoginPassword">Password</label>
-          <div class="student-login-field"><span aria-hidden="true">🔑</span><input id="studentLoginPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Enter your password"><button id="toggleStudentLoginPassword" type="button" aria-label="Show password">👁️</button></div>
-          <button id="studentLoginButton" class="student-login-button" type="submit">🚀 Enter my learning space</button>
-        </form>
-        <p id="studentLoginMessage" class="student-login-message" role="alert" aria-live="polite"></p>
-        <p class="student-login-help">Need an account? Ask your teacher to create one for you.</p>
-      </div>
-    </div>
-  </section>
-
-  <div id="learningApp" hidden>
+<body>
+  <div id="learningApp">
   <a class="skip-link" href="#mainContent">Skip to main content</a>
 
-  <div class="student-account-bar">
-    <div><span id="studentAccountAvatar">ST</span><p>Hello, <strong id="studentAccountName">Student</strong><small id="studentAccountClass">Vocabulary class</small></p></div>
-    <div><span id="studentSyncStatus" class="student-sync-status"><i></i> Synced</span><button id="studentLogoutButton" type="button">↪ Log out</button></div>
+  <div class="student-account-bar public-learning-bar" role="note">
+    <div><span aria-hidden="true">🌍</span><p><strong>Open learning · No account needed</strong><small>Your progress is saved in this browser.</small></p></div>
   </div>
 
   <div class="sky-decor" aria-hidden="true">
@@ -477,7 +448,6 @@
   <div id="confetti" class="confetti-layer" aria-hidden="true"></div>
   </div>
 
-  <script type="module" src="student-auth.js"></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=public-1" defer></script>
 </body>
 </html>
