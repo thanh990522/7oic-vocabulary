@@ -1,15 +1,15 @@
 "use strict";
 
 const THEMES = [
-  { id: 1, title: "What is identity?", icon: "🪪", available: true, words: 60 },
-  { id: 2, title: "Language & Communication", icon: "🌍", available: true, words: 71 },
-  { id: 3, title: "Coming soon", icon: "🔬", available: false },
-  { id: 4, title: "Coming soon", icon: "🎨", available: false },
-  { id: 5, title: "Coming soon", icon: "🌱", available: false },
-  { id: 6, title: "Coming soon", icon: "🚀", available: false },
-  { id: 7, title: "Coming soon", icon: "🏛️", available: false },
-  { id: 8, title: "Coming soon", icon: "💡", available: false },
-  { id: 9, title: "Coming soon", icon: "🌈", available: false }
+  { id: 1, title: "What is identity?", icon: "🪪", available: true, words: 60, hasIpa: true },
+  { id: 2, title: "Language & Communication", icon: "🌍", available: true, words: 71, hasIpa: true },
+  { id: 3, title: "Using Pictures", icon: "📸", available: true, words: 74, hasIpa: false },
+  { id: 4, title: "Travel", icon: "✈️", available: true, words: 104, hasIpa: false },
+  { id: 5, title: "Education", icon: "🎓", available: true, words: 89, hasIpa: false },
+  { id: 6, title: "Technology and Us", icon: "🤖", available: true, words: 89, hasIpa: false },
+  { id: 7, title: "World Problems", icon: "🌍", available: true, words: 74, hasIpa: false },
+  { id: 8, title: "Goals and Achievements", icon: "🏆", available: true, words: 108, hasIpa: false },
+  { id: 9, title: "Using the Earth's Resources", icon: "🌱", available: true, words: 74, hasIpa: false }
 ];
 
 const VOCABULARY = [
@@ -292,7 +292,7 @@ function populateLessonSelects() {
 function renderThemeGrid() {
   elements.themeGrid.innerHTML = THEMES.map(theme => {
     const stateClass = theme.available ? "theme-card--active" : "theme-card--soon";
-    const details = theme.available ? `${theme.words} words · IPA · Audio · Flashcards · Practice Lab` : "Content is being prepared";
+    const details = theme.available ? `${theme.words} words · ${theme.hasIpa ? "IPA · " : ""}Audio · Flashcards · Practice Lab` : "Content is being prepared";
     return `
       <button class="theme-card ${stateClass}" type="button" data-theme-id="${theme.id}" aria-disabled="${String(!theme.available)}"${theme.id === 1 ? ' aria-current="true"' : ""}>
         <span class="theme-card__number">${theme.id}</span>
@@ -1178,8 +1178,8 @@ function bindEvents() {
       showToast(`Theme ${theme.id} is being prepared. See you in the next update! ${theme.icon}`);
       return;
     }
-    if (theme.id === 2) {
-      window.location.href = "theme2.html";
+    if (theme.id !== 1) {
+      window.location.href = theme.id === 1 ? "index.html" : theme.id === 2 ? "theme2.html" : `theme${theme.id}.html`;
       return;
     }
     document.querySelector("#theme1").scrollIntoView({ behavior: "smooth", block: "start" });
